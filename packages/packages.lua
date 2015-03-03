@@ -342,8 +342,36 @@ function findKeyForName(name1)
     return nil
 end
 
+function createProductsClj()
+    local sortedNames = {}
+
+    for _, name in pairs(names) do
+        table.insert(sortedNames, name)
+    end
+
+    table.sort(sortedNames)
+
+    local fout = io.open("products.clj", "w")
+    fout:write("(ns clouseau.products)\n\n")
+    fout:write("(def products [\n")
+
+    for _, name in ipairs(sortedNames) do
+        local key = findKeyForName(name)
+        local url = repoTable[key]
+        fout:write("     [\"" .. name .. "\"\n")
+        fout:write("        {:classname   \"org.sqlite.JDBC\"\n")
+        fout:write("         :subprotocol \"sqlite\"\n")
+        fout:write("         :subname     \"packages/" .. key .. "/primary.sqlite\"\n")
+        fout:write("     }]\n")
+    end
+    fout:write("])\n\n")
+
+    fout:close()
+end
+
 function main()
     downloadRPMDatabases()
+    createProductsClj()
 end
 
 main()
