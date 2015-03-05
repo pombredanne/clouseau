@@ -1,11 +1,12 @@
 (ns clouseau.core)
 
-(require '[ring.adapter.jetty     :as jetty])
-(require '[ring.middleware.params :as http-params])
+(require '[ring.adapter.jetty      :as jetty])
+(require '[ring.middleware.params  :as http-params])
+(require '[ring.middleware.cookies :as cookies])
 
-(require '[clojure.tools.cli      :as cli])
+(require '[clojure.tools.cli       :as cli])
 
-(require '[clouseau.server        :as server])
+(require '[clouseau.server         :as server])
 
 
 (def cli-options
@@ -13,7 +14,7 @@
   [["-p" "--port   PORT"    "port number"   :id :port]])
 
 (def app
-    (-> server/handler http-params/wrap-params))
+    (-> server/handler cookies/wrap-cookies http-params/wrap-params))
 
 (defn start-server
     [port]
