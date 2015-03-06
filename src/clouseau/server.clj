@@ -101,7 +101,7 @@
     (and package (not (empty? package))))
 
 (defn html-renderer
-    [products package package-descriptions ccs-description products-without-descriptions]
+    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions]
     (page/xhtml
         (render-html-header package)
         [:body
@@ -121,11 +121,11 @@
                     ))
                 
                 (if (package? package)
-                    (for [product products]
+                    (for [products-per-description products-per-descriptions]
                         [:div
-                            [:div {:class "label label-primary" :style "margin-right:3px"} (first product)] 
-                            [:div {:class "alert alert-success"} (get package-descriptions (first product))]]
-     ;                       (render-description (first products-per-description))]
+                            (for [product (second products-per-description)]
+                                [:div {:class "label label-primary" :style "margin-right:3px"} product]) 
+                            (render-description (first products-per-description))]
                     )
                 )
                 (if (and (package? package) products-without-descriptions)
@@ -163,14 +163,25 @@
         (for [product products :when (get package-descriptions (first product))]
             (first product))))
 
+(defn get-products-per-description
+    [package-descriptions products]
+    (let [variants
+        (into #{}
+            (for [product products]
+                (get package-descriptions product)))]
+        (for [variant variants]
+            [variant (for [product products :when (= variant (get package-descriptions product))] product)])))
+
 (defn process
     [package new-description]
     (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
         (store-ccs-description package new-description))
     (let [ccs-description               (read-ccs-description package)
           package-descriptions          (read-package-descriptions products/products package)
-          products-without-descriptions (get-products-without-descriptions products/products package-descriptions)]
-        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-without-descriptions))
+          products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
+          products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
+          products-per-description      (get-products-per-description package-descriptions products-with-descriptions)]
+        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions))
             (http-response/content-type "text/html"))))
 
 (defn perform-normal-processing
@@ -180,6 +191,13 @@
           package             (get params "package")
           new-description     (get params "new-description")]
           (process package new-description)))
+
+(defn render-all-descriptions
+    [request]
+    (let [descriptions (read-all-descriptions)]
+        (println descriptions)
+        (-> (http-response/response (html-renderer-descriptions descriptions))
+            (http-response/content-type "text/html"))))
 
 (defn return-file
     [file-name content-type]
