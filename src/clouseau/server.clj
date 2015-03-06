@@ -20,8 +20,16 @@
     (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
           desc   (:description (first result))]
         (if (not desc)
-            [:div {:class "alert alert-danger"} "Not found"]
-            [:div {:class "alert alert-success"} (.replaceAll desc "\n" "<br />")])))
+            nil
+            (.replaceAll desc "\n" "<br />"))))
+
+(defn read-package-descriptions
+    [products package]
+    (zipmap
+        (for [product products]
+            (first product))
+        (for [product products]
+            (read-description product package))))
 
 (defn read-ccs-description
     [package]
@@ -82,15 +90,25 @@
         ] ; /.container-fluid
 ]); </nav>
 
+(defn render-description
+    [description]
+    (if-not description
+        [:div {:class "alert alert-danger"} "Not found"]
+        [:div {:class "alert alert-success"} description]))
+
+(defn package?
+    [package]
+    (and package (not (empty? package))))
+
 (defn html-renderer
-    [products package ccs-description]
+    [products package package-descriptions ccs-description products-without-descriptions]
     (page/xhtml
         (render-html-header package)
         [:body
             [:div {:class "container"}
                 (render-navigation-bar-section package)
 
-                (if (and package (not (empty? package)))
+                (if (package? package)
                     (form/form-to [:post "/"]
                         [:div {:class "label label-primary"} "Description provided by CCS"]
                         [:br]
@@ -102,13 +120,20 @@
                         [:br]
                     ))
                 
-                (if (and package (not (empty? package)))
-                    [:table {:class "table table-stripped"}
-                        (for [product products]
-                            [:div [:div {:class "label label-primary"} (first product)] 
-                                  (read-description product package)]
-                        )
-                    ])
+                (if (package? package)
+                    (for [product products]
+                        [:div
+                            [:div {:class "label label-primary" :style "margin-right:3px"} (first product)] 
+                            [:div {:class "alert alert-success"} (get package-descriptions (first product))]]
+     ;                       (render-description (first products-per-description))]
+                    )
+                )
+                (if (and (package? package) products-without-descriptions)
+                    [:div
+                    (for [product products-without-descriptions]
+                        [:div {:class "label label-primary" :style "margin-right:3px"} product])
+                        [:div {:class "alert alert-danger"} "Not found"]]
+                    )
                 (render-footer)
             ] ; </div class="container">
         ] ; </body>
@@ -118,22 +143,43 @@
     [parameter]
     (and parameter (not (empty? parameter))))
 
-(defn perform-normal-processing
+(defn log-request-information
     [request]
     (println "time:        " (.toString (new java.util.Date)))
     (println "addr:        " (request :remote-addr))
     (println "params:      " (request :params))
     (println "user-agent:  " ((request :headers) "user-agent"))
-    (println "")
+    (println ""))
+
+(defn get-products-without-descriptions
+    [products package-descriptions]
+   ; (sort
+        (for [product products :when (not (get package-descriptions (first product)))]
+            (first product)));)
+
+(defn get-products-with-descriptions
+    [products package-descriptions]
+    (sort
+        (for [product products :when (get package-descriptions (first product))]
+            (first product))))
+
+(defn process
+    [package new-description]
+    (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
+        (store-ccs-description package new-description))
+    (let [ccs-description               (read-ccs-description package)
+          package-descriptions          (read-package-descriptions products/products package)
+          products-without-descriptions (get-products-without-descriptions products/products package-descriptions)]
+        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-without-descriptions))
+            (http-response/content-type "text/html"))))
+
+(defn perform-normal-processing
+    [request]
+    (log-request-information request)
     (let [params              (request :params)
-          uri                 (request :uri)
           package             (get params "package")
           new-description     (get params "new-description")]
-          (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
-              (store-ccs-description package new-description))
-          (let [ccs-description (read-ccs-description package)]
-              (-> (http-response/response (html-renderer products/products package ccs-description))
-                  (http-response/content-type "text/html")))))
+          (process package new-description)))
 
 (defn return-file
     [file-name content-type]
@@ -152,5 +198,5 @@
             "/bootstrap.min.css" (return-file "bootstrap.min.css" "text/css")
             "/smearch.css"       (return-file "smearch.css" "text/css")
             "/bootstrap.min.js"  (return-file "bootstrap.min.js" "application/javascript")
-            (perform-normal-processing request))))
+            "/"                  (perform-normal-processing request))))
 
