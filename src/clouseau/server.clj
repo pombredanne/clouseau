@@ -9,6 +9,12 @@
 
 (require '[clouseau.products :as products])
 
+(def ccs-db
+    {:classname   "org.sqlite.JDBC"
+     :subprotocol "sqlite"
+     :subname     "ccs_descriptions.db"
+    })
+
 (defn read-description
     [product package]
     (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
@@ -16,6 +22,20 @@
         (if (not desc)
             [:div {:class "alert alert-danger"} "Not found"]
             [:div {:class "alert alert-success"} (.replaceAll desc "\n" "<br />")])))
+
+(defn read-ccs-description
+    [package]
+    (let [result (jdbc/query ccs-db (str "select description from packages where name='" package "';"))
+          desc   (:description (first result))]
+        (if (not desc)
+            nil
+            desc))) ; (.replaceAll desc "\n" "<br />"))))
+
+(defn store-ccs-description
+    [package description]
+    (jdbc/delete! ccs-db :packages ["name = ?" package])
+    (jdbc/insert! ccs-db :packages {:name package :description description})
+)
 
 (defn render-html-header
     [package]
@@ -63,13 +83,25 @@
 ]); </nav>
 
 (defn html-renderer
-    [products package]
+    [products package ccs-description]
     (page/xhtml
         (render-html-header package)
         [:body
             [:div {:class "container"}
                 (render-navigation-bar-section package)
 
+                (if (and package (not (empty? package)))
+                    (form/form-to [:post "/"]
+                        [:div {:class "label label-primary"} "Description provided by CCS"]
+                        [:br]
+                        (form/hidden-field "package" (str package))
+                        (form/text-area {:cols "120" :rows "10"} "new-description" ccs-description)
+                        [:br]
+                        (form/submit-button {:class "btn btn-danger"} "Update description")
+                        [:br]
+                        [:br]
+                    ))
+                
                 (if (and package (not (empty? package)))
                     [:table {:class "table table-stripped"}
                         (for [product products]
@@ -95,9 +127,13 @@
     (println "")
     (let [params              (request :params)
           uri                 (request :uri)
-          package             (get params "package")]
-          (-> (http-response/response (html-renderer products/products package))
-              (http-response/content-type "text/html"))))
+          package             (get params "package")
+          new-description     (get params "new-description")]
+          (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
+              (store-ccs-description package new-description))
+          (let [ccs-description (read-ccs-description package)]
+              (-> (http-response/response (html-renderer products/products package ccs-description))
+                  (http-response/content-type "text/html")))))
 
 (defn return-file
     [file-name content-type]
