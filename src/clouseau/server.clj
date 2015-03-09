@@ -167,7 +167,7 @@
             [:div {:class "container"}
                 (render-navigation-bar-section nil)
                     (for [description descriptions]
-                        [:div [:div {:class "label label-warning"} (get description :name)]
+                        [:div [:div {:class "label label-warning"} [:a {:href (str "../?package=" (get description :name) ) } (get description :name)]]
                               [:div {:class "alert alert-success"} (.replaceAll (str "" (get description :description)) "\\n" "<br />")]]
                     )
                 (render-footer)
