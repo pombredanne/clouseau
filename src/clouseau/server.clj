@@ -39,6 +39,10 @@
             nil
             desc))) ; (.replaceAll desc "\n" "<br />"))))
 
+(defn read-all-descriptions
+    []
+    (jdbc/query ccs-db (str "select name, description from packages order by name;")))
+
 (defn store-ccs-description
     [package description]
     (jdbc/delete! ccs-db :packages ["name = ?" package])
@@ -85,6 +89,11 @@
                 ] ; col ends
                 [:div {:class "col-md-5"}
                     (render-search-field package)
+                ] ; col ends
+                [:div {:class "col-md-2"}
+                    [:div {:class "navbar-header"}
+                        [:a {:href "/descriptions" :class "navbar-brand"} "All CCS descriptions"]
+                    ] ; ./navbar-header
                 ] ; col ends
             ] ; row ends
         ] ; /.container-fluid
@@ -133,6 +142,22 @@
                     (for [product products-without-descriptions]
                         [:div {:class "label label-primary" :style "margin-right:3px"} product])
                         [:div {:class "alert alert-danger"} "Not found"]]
+                    )
+                (render-footer)
+            ] ; </div class="container">
+        ] ; </body>
+    ))
+
+(defn html-renderer-descriptions
+    [descriptions]
+    (page/xhtml
+        (render-html-header nil)
+        [:body
+            [:div {:class "container"}
+                (render-navigation-bar-section nil)
+                    (for [description descriptions]
+                        [:div [:div {:class "label label-warning"} (get description :name)]
+                              [:div {:class "alert alert-success"} (.replaceAll (str "" (get description :description)) "\\n" "<br />")]]
                     )
                 (render-footer)
             ] ; </div class="container">
@@ -216,5 +241,6 @@
             "/bootstrap.min.css" (return-file "bootstrap.min.css" "text/css")
             "/smearch.css"       (return-file "smearch.css" "text/css")
             "/bootstrap.min.js"  (return-file "bootstrap.min.js" "application/javascript")
-            "/"                  (perform-normal-processing request))))
+            "/"                  (perform-normal-processing request)
+            "/descriptions"      (render-all-descriptions request))))
 
