@@ -109,13 +109,23 @@
     [package]
     (and package (not (empty? package))))
 
+(defn show-info-about-update
+    [package]
+    [:div
+        [:div {:class "label label-warning"} (str "Description for the package '" package "' has been updated, thank you!")]
+        [:br]
+        [:br]])
+
 (defn html-renderer
-    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions]
+    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description]
     (page/xhtml
         (render-html-header package)
         [:body
             [:div {:class "container"}
                 (render-navigation-bar-section package)
+
+                (if new-description
+                    (show-info-about-update package))
 
                 (if (package? package)
                     (form/form-to [:post "/"]
@@ -128,21 +138,22 @@
                         [:br]
                         [:br]
                     ))
-                
+
                 (if (package? package)
                     (for [products-per-description products-per-descriptions]
                         [:div
                             (for [product (second products-per-description)]
                                 [:div {:class "label label-primary" :style "margin-right:3px"} product]) 
                             (render-description (first products-per-description))]
-                    )
-                )
+                    ))
+
                 (if (and (package? package) products-without-descriptions)
                     [:div
                     (for [product products-without-descriptions]
                         [:div {:class "label label-primary" :style "margin-right:3px"} product])
                         [:div {:class "alert alert-danger"} "Not found"]]
                     )
+
                 (render-footer)
             ] ; </div class="container">
         ] ; </body>
@@ -206,7 +217,7 @@
           products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
           products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
           products-per-description      (get-products-per-description package-descriptions products-with-descriptions)]
-        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions))
+        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description))
             (http-response/content-type "text/html"))))
 
 (defn perform-normal-processing
