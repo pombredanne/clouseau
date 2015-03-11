@@ -266,17 +266,22 @@
           package-descriptions          (read-package-descriptions products/products package)
           products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
           products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
-          products-per-description      (get-products-per-description package-descriptions products-with-descriptions)]
-        (-> (http-response/response (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description))
+          products-per-description      (get-products-per-description package-descriptions products-with-descriptions)
+          html-output                   (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description)]
+        (-> (http-response/response html-output)
             (http-response/content-type "text/html"))))
 
 (defn perform-normal-processing
     [request]
     (log-request-information request)
     (let [params              (request :params)
+          cookies             (request :cookies)
           package             (get params "package")
           new-description     (get params "new-description")]
-          (process package new-description)))
+          (println "Incoming cookies: " cookies)
+          (let [response (process package new-description)]
+              (println "Outgoing cookies: " (get response :cookies))
+              response)))
 
 (defn render-all-descriptions
     [request]
