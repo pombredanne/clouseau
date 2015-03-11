@@ -115,6 +115,15 @@
             [:div {:class "input-group-btn"}
                 (form/submit-button {:class "btn btn-default"} "Search")]]))
 
+(defn render-name-field
+    [user-name]
+    (form/form-to {:class "navbar-form navbar-left" :role "search"} [:get "/" ]
+        [:div {:class "input-group"}
+            ;[:span {:class "input-group-addon"} "Name"]
+            (form/text-field {:size "10" :class "form-control" :placeholder "User name"} "user-name" (str user-name))
+            [:div {:class "input-group-btn"}
+                (form/submit-button {:class "btn btn-default"} "Remember me")]]))
+
 (defn render-navigation-bar-section
     [package]
     [:nav {:class "navbar navbar-inverse navbar-fixed-top" :role "navigation"}
@@ -133,6 +142,9 @@
                         [:a {:href "/descriptions" :class "navbar-brand"} "All CCS descriptions"]
                     ] ; ./navbar-header
                 ] ; col ends
+                [:div {:class "col-md-3"}
+                    (render-name-field "")
+                    ]
             ] ; row ends
         ] ; /.container-fluid
 ]); </nav>
