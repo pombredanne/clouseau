@@ -62,8 +62,11 @@
             desc))) ; (.replaceAll desc "\n" "<br />"))))
 
 (defn read-all-descriptions
+    "Read all descriptions from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     []
-    (jdbc/query ccs-db (str "select name, description from packages order by name;")))
+    ; we need to use trim() here because some package names starts with one space or even with more spaces
+    ; due to errors in the original database
+    (jdbc/query ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
 
 (defn store-ccs-description
     [package description]
