@@ -9,12 +9,33 @@
 
 (require '[clouseau.products :as products])
 
+;
+; This database file contains table named 'ccs-description'.
+;
+; Table 'ccs-description' should have the following format:
+;    create table packages (
+;        name        text not null,
+;        description text not null
+;    );
+;
 (def ccs-db
     {:classname   "org.sqlite.JDBC"
      :subprotocol "sqlite"
      :subname     "ccs_descriptions.db"
     })
 
+;
+; This database file contains table named 'changes'.
+;
+; Table 'changes' should have the following format:
+;     create table changes (
+;         id          integer primary key asc,
+;         date_time   text,
+;         user_name   text,
+;         package     text,
+;         description text
+;     );
+;
 (def changes-db
     {:classname   "org.sqlite.JDBC"
      :subprotocol "sqlite"
@@ -69,6 +90,7 @@
     (jdbc/query ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
 
 (defn store-ccs-description
+    "Store new ccs description into the table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     [package description]
     (jdbc/delete! ccs-db :packages ["name = ?" package])
     (jdbc/insert! ccs-db :packages {:name package :description description})
@@ -293,10 +315,11 @@
           )))
 
 (defn render-all-descriptions
+    "Create page containing all descriptions made by CCS users."
     [request]
     (let [descriptions (read-all-descriptions)
           user-name    (get (get (request :cookies) "user-name") :value)]
-        (println descriptions)
+        ;(println descriptions)
         (-> (http-response/response (html-renderer-descriptions descriptions user-name))
             (http-response/content-type "text/html"))))
 
@@ -309,6 +332,7 @@
             (http-response/content-type content-type))))
 
 (defn handler
+    "Handler that is called by Ring for all requests received from user(s)."
     [request]
     (println "request URI: " (request :uri))
     (let [uri (request :uri)]
