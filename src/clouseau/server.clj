@@ -15,6 +15,28 @@
      :subname     "ccs_descriptions.db"
     })
 
+(def changes-db
+    {:classname   "org.sqlite.JDBC"
+     :subprotocol "sqlite"
+     :subname     "changes.db"
+    })
+
+(defn get-calendar
+    "Gets a calendar using the default time zone and locale."
+    []
+    (java.util.Calendar/getInstance))
+
+(defn format-date-using-desired-format
+    "Format given date using desired format, for example 'yyyy-MM-dd' etc."
+    [calendar desired-format]
+    (let [date-format (new java.text.SimpleDateFormat desired-format)]
+        (.format date-format (.getTime calendar))))
+
+(defn format-date-time
+    "Format given date using the following format: 'yyyy-MM-dd HH:mm:ss'"
+    [calendar]
+    (format-date-using-desired-format calendar "yyyy-MM-dd HH:mm:ss"))
+
 (defn read-description
     [product package]
     (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
@@ -48,6 +70,18 @@
     (jdbc/delete! ccs-db :packages ["name = ?" package])
     (jdbc/insert! ccs-db :packages {:name package :description description})
 )
+
+(defn not-empty-parameter?
+    [parameter]
+    (and parameter (not (empty? parameter))))
+
+(defn store-changes
+    [user-name package description]
+    (if (and (not-empty-parameter? package) (not-empty-parameter? description))
+        (let [date (format-date-time (get-calendar))]
+            (jdbc/insert! changes-db :changes {:date_time date :user_name user-name :package package :description description})
+            (println date user-name package)
+        )))
 
 (defn render-html-header
     [package]
@@ -187,10 +221,6 @@
         ] ; </body>
     ))
 
-(defn not-empty-parameter?
-    [parameter]
-    (and parameter (not (empty? parameter))))
-
 (defn log-request-information
     [request]
     (println "time:        " (.toString (new java.util.Date)))
@@ -235,6 +265,7 @@
           products-per-description      (get-products-per-description package-descriptions products-with-descriptions)
           user-name                     (get-user-name new-user-name old-user-name)
           html-output                   (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
+        (store-changes user-name package new-description)
         (if user-name
             (-> (http-response/response html-output)
                 (http-response/set-cookie :user-name user-name {:max-age 36000000})
