@@ -371,9 +371,10 @@
     [file-name content-type]
     (let [file (new java.io.File "www" file-name)]
         (println-and-flush "Returning file " (.getAbsolutePath file))
-        (println-and-flush "")
-        (-> (http-response/response file)
-            (http-response/content-type content-type))))
+        (if (.exists file)
+            (-> (http-response/response file)
+                (http-response/content-type content-type))
+            (println-and-flush "return-file(): can not access file: " (.getName file)))))
 
 (defn handler
     "Handler that is called by Ring for all requests received from user(s)."
