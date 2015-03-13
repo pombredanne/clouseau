@@ -104,11 +104,15 @@
 
 (defn read-description
     [product package]
-    (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
-          desc   (:description (first result))]
-        (if (not desc)
-            nil
-            (.replaceAll desc "\n" "<br />"))))
+    (try
+        (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
+              desc   (:description (first result))]
+            (if (not desc)
+                nil
+                (.replaceAll desc "\n" "<br />")))
+        (catch Exception e
+            (println-and-flush "read-description(): error accessing database '" (:subname (second product)) "'!")
+            nil)))
 
 (defn read-package-descriptions
     [products package]
@@ -120,11 +124,15 @@
 
 (defn read-ccs-description
     [package]
-    (let [result (jdbc/query ccs-db (str "select description from packages where name='" package "';"))
-          desc   (:description (first result))]
-        (if (not desc)
-            nil
-            desc))) ; (.replaceAll desc "\n" "<br />"))))
+    (try
+        (let [result (jdbc/query ccs-db (str "select description from packages where name='" package "';"))
+              desc   (:description (first result))]
+            (if (not desc)
+                nil
+                desc)) ; (.replaceAll desc "\n" "<br />"))))
+        (catch Exception e
+            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            nil)))
 
 (defn read-all-descriptions
     "Read all descriptions from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
