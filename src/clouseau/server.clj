@@ -80,6 +80,12 @@
      :subname     "changes.db"
     })
 
+(defn println-and-flush
+    "Original (println) has problem with syncing when it's called from more threads. This function is a bit better."
+    [& more]
+    (.write *out* (str (clojure.string/join " " more) "\n"))
+    (flush))
+
 (defn get-calendar
     "Gets a calendar using the default time zone and locale."
     []
@@ -143,7 +149,7 @@
     (if (and (not-empty-parameter? package) (not-empty-parameter? description))
         (let [date (format-date-time (get-calendar))]
             (jdbc/insert! changes-db :changes {:date_time date :user_name user-name :package package :description description})
-            (println date user-name package)
+            (println-and-flush date user-name package)
         )))
 
 (defn render-html-header
@@ -286,11 +292,11 @@
 
 (defn log-request-information
     [request]
-    (println "time:        " (.toString (new java.util.Date)))
-    (println "addr:        " (request :remote-addr))
-    (println "params:      " (request :params))
-    (println "user-agent:  " ((request :headers) "user-agent"))
-    (println ""))
+    (println-and-flush "time:        " (.toString (new java.util.Date)))
+    (println-and-flush "addr:        " (request :remote-addr))
+    (println-and-flush "params:      " (request :params))
+    (println-and-flush "user-agent:  " ((request :headers) "user-agent"))
+    (println-and-flush ""))
 
 (defn get-products-without-descriptions
     [products package-descriptions]
@@ -346,9 +352,9 @@
           new-description     (get params "new-description")
           new-user-name       (get params "user-name")
           old-user-name       (get (get cookies "user-name") :value)]
-          (println "Incoming cookies: " cookies)
+          (println-and-flush "Incoming cookies: " cookies)
           (let [response (process package new-description format new-user-name old-user-name)]
-              (println "Outgoing cookies: " (get response :cookies))
+              (println-and-flush "Outgoing cookies: " (get response :cookies))
               response
           )))
 
@@ -357,22 +363,22 @@
     [request]
     (let [descriptions (read-all-descriptions)
           user-name    (get (get (request :cookies) "user-name") :value)]
-        ;(println descriptions)
+        ;(println-and-flush descriptions)
         (-> (http-response/response (html-renderer-descriptions descriptions user-name))
             (http-response/content-type "text/html"))))
 
 (defn return-file
     [file-name content-type]
     (let [file (new java.io.File "www" file-name)]
-        (println "Returning file " (.getAbsolutePath file))
-        (println "")
+        (println-and-flush "Returning file " (.getAbsolutePath file))
+        (println-and-flush "")
         (-> (http-response/response file)
             (http-response/content-type content-type))))
 
 (defn handler
     "Handler that is called by Ring for all requests received from user(s)."
     [request]
-    (println "request URI: " (request :uri))
+    (println-and-flush "request URI: " (request :uri))
     (let [uri (request :uri)]
         (condp = uri
             "/favicon.ico"       (return-file "favicon.ico" "image/x-icon")
