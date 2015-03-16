@@ -128,11 +128,11 @@
         (let [result (jdbc/query ccs-db (str "select description from packages where name='" package "';"))
               desc   (:description (first result))]
             (if (not desc)
-                nil
+                ""     ; special value that will be handled later
                 desc)) ; (.replaceAll desc "\n" "<br />"))))
         (catch Exception e
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
-            nil)))
+            nil)))     ; special value that will be handled later
 
 (defn read-all-descriptions
     "Read all descriptions from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
@@ -350,6 +350,23 @@
     [new-user-name old-user-name]
     (or new-user-name old-user-name))
 
+(defn generate-normal-response
+    [products package package-descriptions ccs-description
+     products-per-description products-without-descriptions new-description user-name]
+     (let [html-output (html-renderer products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
+        (store-changes user-name package new-description)
+        (if user-name
+            (-> (http-response/response html-output)
+                (http-response/set-cookie :user-name user-name {:max-age 36000000})
+                (http-response/content-type "text/html"))
+            (-> (http-response/response html-output)
+                (http-response/content-type "text/html")))))
+
+(defn generate-error-response
+    [package user-name message]
+    (-> (http-response/response (render-error-page package user-name message))
+        (http-response/content-type "text/html")))
+
 (defn process
     [package new-description format new-user-name old-user-name]
     (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
@@ -359,15 +376,9 @@
           products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
           products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
           products-per-description      (get-products-per-description package-descriptions products-with-descriptions)
-          user-name                     (get-user-name new-user-name old-user-name)
-          html-output                   (html-renderer products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
-        (store-changes user-name package new-description)
-        (if user-name
-            (-> (http-response/response html-output)
-                (http-response/set-cookie :user-name user-name {:max-age 36000000})
-                (http-response/content-type "text/html"))
-            (-> (http-response/response html-output)
-                (http-response/content-type "text/html")))))
+          user-name                     (get-user-name new-user-name old-user-name)]
+          (cond (not ccs-description)                (generate-error-response package user-name "Can not read from the database file 'ccs_descriptions.db'!")
+                :else                                (generate-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))))
 
 (defn perform-normal-processing
     [request]
