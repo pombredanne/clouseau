@@ -108,11 +108,11 @@
         (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
               desc   (:description (first result))]
             (if (not desc)
-                nil
+                ""  ; special value that will be handled later
                 (.replaceAll desc "\n" "<br />")))
         (catch Exception e
             (println-and-flush "read-description(): error accessing database '" (:subname (second product)) "'!")
-            nil)))
+            nil)))  ; special value that will be handled later
 
 (defn read-package-descriptions
     [products package]
@@ -328,13 +328,17 @@
 (defn get-products-without-descriptions
     [products package-descriptions]
    ; (sort
-        (for [product products :when (not (get package-descriptions (first product)))]
+        (for [product products
+            ; all descriptions that are equal to "" are not specified
+            :when (empty? (get package-descriptions (first product)))]
             (first product)));)
 
 (defn get-products-with-descriptions
     [products package-descriptions]
     (sort
-        (for [product products :when (get package-descriptions (first product))]
+        (for [product products
+            ; all descriptions that are not equal to "" are specified
+            :when (not (empty? (get package-descriptions (first product))))]
             (first product))))
 
 (defn get-products-per-description
@@ -367,6 +371,18 @@
     (-> (http-response/response (render-error-page package user-name message))
         (http-response/content-type "text/html")))
 
+(defn package-error
+    "Returns sequence of products for whom the database can't be read
+     (it's easy to spot this error because package-descriptions map contains
+      nil for such packages."
+    [package-descriptions]
+    (keys (filter #(nil? (val %)) package-descriptions)))
+
+(defn generate-error-message-package-db-error
+    [package-descriptions]
+    (let [error-products (package-error package-descriptions)]
+        (str "Can not access following " (count error-products) " database" (if (> (count error-products) 1) "s" "") ": " (clojure.string/join ", " error-products))))
+
 (defn process
     [package new-description format new-user-name old-user-name]
     (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
@@ -378,6 +394,7 @@
           products-per-description      (get-products-per-description package-descriptions products-with-descriptions)
           user-name                     (get-user-name new-user-name old-user-name)]
           (cond (not ccs-description)                (generate-error-response package user-name "Can not read from the database file 'ccs_descriptions.db'!")
+                (package-error package-descriptions) (generate-error-response package user-name (generate-error-message-package-db-error package-descriptions))
                 :else                                (generate-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))))
 
 (defn perform-normal-processing
