@@ -228,6 +228,25 @@
         [:div {:class "alert alert-danger"} "Not found"]
         [:div {:class "alert alert-success"} description]))
 
+(defn render-error-page
+    "Render error page with a 'back' button."
+    [package user-name message]
+    (page/xhtml
+        (render-html-header "")
+        [:body
+            [:div {:class "container"}
+                (render-navigation-bar-section package user-name)
+                [:div {:class "col-md-10"}
+                    [:h2 "Sorry, error occured in Clouseau"]
+                    [:p message]
+                    [:button {:class "btn btn-primary" :onclick "window.history.back()" :type "button"} "Back"]
+                ]
+                [:br][:br][:br][:br]
+                (render-footer)
+            ] ; </div class="container">
+        ] ; </body>
+    ))
+
 (defn package?
     [package]
     (and package (not (empty? package))))
