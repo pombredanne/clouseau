@@ -52,12 +52,21 @@
   [["-p" "--port   PORT"    "port number"   :id :port]])
 
 (def app
-    (-> server/handler cookies/wrap-cookies http-params/wrap-params))
+    "Ring application."
+    (-> server/handler
+        cookies/wrap-cookies
+        http-params/wrap-params))
 
 (defn start-server
+    "Start server on specified port."
     [port]
     (println "Starting the server at the port: " port)
     (jetty/run-jetty app {:port (read-string port)}))
+
+(defn get-port
+    "Returns specified port or default port if none is specified on the command line."
+    [specified-port]
+    (or specified-port "3000"))
 
 (defn -main
     "Entry point to the Clouseau server."
@@ -65,5 +74,5 @@
     (let [all-options      (cli/parse-opts args cli-options)
           options          (all-options :options)
           port             (options :port)]
-          (start-server port)))
+          (start-server (get-port port))))
 
