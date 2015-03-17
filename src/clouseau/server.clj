@@ -207,7 +207,7 @@
                         [:a {:href "/" :class "navbar-brand"} "Clouseau"]
                     ] ; ./navbar-header
                 ] ; col ends
-                [:div {:class "col-md-5"}
+                [:div {:class "col-md-4"}
                     (render-search-field package)
                 ] ; col ends
                 [:div {:class "col-md-2"}
@@ -217,7 +217,12 @@
                 ] ; col ends
                 [:div {:class "col-md-3"}
                     (render-name-field user-name)
-                    ]
+                ]
+                [:div {:class "col-md-1"}
+                    [:div {:class "navbar-header"}
+                        [:a {:href "/users" :class "navbar-brand"} "Users"]
+                    ] ; ./navbar-header
+                ] ; col ends
             ] ; row ends
         ] ; /.container-fluid
 ]); </nav>
@@ -312,6 +317,40 @@
                         [:div [:div {:class "label label-warning"} [:a {:href (str "../?package=" (get description :name) ) } (get description :name)]]
                               [:div {:class "alert alert-success"} (.replaceAll (str "" (get description :description)) "\\n" "<br />")]]
                     )
+                (render-footer)
+            ] ; </div class="container">
+        ] ; </body>
+    ))
+
+(defn html-renderer-users
+    [statistic changes user-name]
+    (page/xhtml
+        (render-html-header nil)
+        [:body
+            [:div {:class "container"}
+                (render-navigation-bar-section nil user-name)
+                [:table {:class "table table-stripped table-hover" :style "width:auto"}
+                    [:tr [:th "User name"]
+                         [:th "Changes made"]]
+                    (for [stat statistic]
+                        [:tr [:td (:user_name stat)]
+                             [:td (:cnt stat)]]
+                    )
+                ]
+                [:br]
+                [:table {:class "table table-stripped table-hover" :style "width:auto"}
+                    [:tr [:th "ID"]
+                         [:th "Date"]
+                         [:th "Package"]
+                         [:th "User"]
+                         [:th "Description"]]
+                    (for [change changes]
+                        [:tr [:td (:id change)]
+                             [:td (:date_time change)]
+                             [:td (:package change)]
+                             [:td (:user_name change)]
+                             [:td (:description change)]])
+                ]
                 (render-footer)
             ] ; </div class="container">
         ] ; </body>
@@ -422,6 +461,15 @@
         (-> (http-response/response (html-renderer-descriptions descriptions user-name))
             (http-response/content-type "text/html"))))
 
+(defn render-users-info
+    "Create page containing user info(s)."
+    [request]
+    (let [changes-statistic (read-changes-statistic)
+          changes           (read-changes)
+          user-name    (get (get (request :cookies) "user-name") :value)]
+        (-> (http-response/response (html-renderer-users changes-statistic changes user-name))
+            (http-response/content-type "text/html"))))
+
 (defn return-file
     [file-name content-type]
     (let [file (new java.io.File "www" file-name)]
@@ -442,5 +490,6 @@
             "/smearch.css"       (return-file "smearch.css" "text/css")
             "/bootstrap.min.js"  (return-file "bootstrap.min.js" "application/javascript")
             "/"                  (perform-normal-processing request)
-            "/descriptions"      (render-all-descriptions request))))
+            "/descriptions"      (render-all-descriptions request)
+            "/users"             (render-users-info request))))
 
