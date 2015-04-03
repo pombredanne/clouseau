@@ -281,6 +281,10 @@
         [:br]
         [:br]])
 
+(defn text-renderer
+    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
+    "TBD")
+
 (defn html-renderer
     [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
     (page/xhtml
@@ -423,10 +427,23 @@
             (-> (http-response/response html-output)
                 (http-response/content-type "text/html")))))
 
+(defn generate-txt-normal-response
+    [products package package-descriptions ccs-description
+     products-per-description products-without-descriptions new-description user-name]
+     (let [text-output (text-renderer products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
+        (store-changes user-name package new-description)
+            (-> (http-response/response text-output)
+                (http-response/content-type "text/plain"))))
+
 (defn generate-error-response
     [package user-name message]
     (-> (http-response/response (render-error-page package user-name message))
         (http-response/content-type "text/html")))
+
+(defn generate-txt-error-response
+    [package user-name message]
+    (-> (http-response/response (str "Sorry, error occured in Clouseau:" message))
+        (http-response/content-type "text/plain")))
 
 (defn package-error
     "Returns sequence of products for whom the database can't be read
