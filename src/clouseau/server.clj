@@ -114,6 +114,24 @@
             (println-and-flush "read-description(): error accessing database '" (:subname (second product)) "'!")
             nil)))  ; special value that will be handled later
 
+(defn read-changes-statistic
+    []
+    (try
+        (jdbc/query changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
+        (catch Exception e
+            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            (println e)
+            nil)))  ; special value that will be handled later
+
+(defn read-changes
+    []
+    (try
+        (jdbc/query changes-db (str "select * from changes order by id;"))
+        (catch Exception e
+            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            (println e)
+            nil)))  ; special value that will be handled later
+
 (defn read-package-descriptions
     [products package]
     (zipmap
