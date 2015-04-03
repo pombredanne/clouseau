@@ -441,7 +441,7 @@
         (str "Can not access following " (count error-products) " database" (if (> (count error-products) 1) "s" "") ": " (clojure.string/join ", " error-products))))
 
 (defn process
-    [package new-description format new-user-name old-user-name]
+    [package new-description output-format new-user-name old-user-name]
     (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
         (store-ccs-description package new-description))
     (let [ccs-description               (read-ccs-description package)
@@ -459,13 +459,13 @@
     (log-request-information request)
     (let [params              (request :params)
           cookies             (request :cookies)
-          format              (get params "format")
+          output-format       (get params "format" "html")
           package             (get params "package")
           new-description     (get params "new-description")
           new-user-name       (get params "user-name")
           old-user-name       (get (get cookies "user-name") :value)]
           (println-and-flush "Incoming cookies: " cookies)
-          (let [response (process package new-description format new-user-name old-user-name)]
+          (let [response (process package new-description output-format new-user-name old-user-name)]
               (println-and-flush "Outgoing cookies: " (get response :cookies))
               response
           )))
