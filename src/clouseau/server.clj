@@ -283,7 +283,10 @@
 
 (defn text-renderer
     [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
-    "TBD")
+    (str
+        "[Package]\n" package
+        "\n\n[CCS Description]\n" ccs-description
+        "\n\n"))
 
 (defn html-renderer
     [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
