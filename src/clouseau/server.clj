@@ -467,9 +467,14 @@
           products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
           products-per-description      (get-products-per-description package-descriptions products-with-descriptions)
           user-name                     (get-user-name new-user-name old-user-name)]
-          (cond (not ccs-description)                (generate-error-response package user-name "Can not read from the database file 'ccs_descriptions.db'!")
-                (package-error package-descriptions) (generate-error-response package user-name (generate-error-message-package-db-error package-descriptions))
-                :else                                (generate-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))))
+          (condp = output-format
+              "html" (cond (not ccs-description)                (generate-error-response package user-name "Can not read from the database file 'ccs_descriptions.db'!")
+                           (package-error package-descriptions) (generate-error-response package user-name (generate-error-message-package-db-error package-descriptions))
+                           :else                                (generate-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))
+              "txt"  (cond (not ccs-description)                (generate-txt-error-response package user-name "Can not read from the database file 'ccs_descriptions.db'!")
+                           (package-error package-descriptions) (generate-txt-error-response package user-name (generate-error-message-package-db-error package-descriptions))
+                           :else                                (generate-txt-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))
+)))
 
 (defn perform-normal-processing
     [request]
