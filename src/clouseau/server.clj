@@ -81,13 +81,14 @@
     })
 
 (defn println-and-flush
-    "Original (println) has problem with syncing when it's called from more threads. This function is a bit better."
+    "Original (println) has problem with syncing when it's called from more threads.
+     This function is a bit better because it flushes all output immediatelly."
     [& more]
     (.write *out* (str (clojure.string/join " " more) "\n"))
     (flush))
 
 (defn get-calendar
-    "Gets a calendar using the default time zone and locale."
+    "Gets a calendar using the default time zone and default locale."
     []
     (java.util.Calendar/getInstance))
 
@@ -103,6 +104,7 @@
     (format-date-using-desired-format calendar "yyyy-MM-dd HH:mm:ss"))
 
 (defn read-description
+    "Read description from the database for specified product and package."
     [product package]
     (try
         (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
@@ -485,6 +487,7 @@
 )))
 
 (defn perform-normal-processing
+    "Generates Clouseau main page."
     [request]
     (log-request-information request)
     (let [params              (request :params)
@@ -501,7 +504,7 @@
           )))
 
 (defn render-all-descriptions
-    "Create page containing all descriptions made by CCS users."
+    "Create page containing all descriptions made by CCS users in Clouseau database."
     [request]
     (let [descriptions (read-all-descriptions)
           user-name    (get (get (request :cookies) "user-name") :value)]
@@ -519,6 +522,8 @@
             (http-response/content-type "text/html"))))
 
 (defn return-file
+    "Creates HTTP response containing content of specified file.
+     Special value nil / HTTP response 404 is returned in case of any I/O error."
     [file-name content-type]
     (let [file (new java.io.File "www" file-name)]
         (println-and-flush "Returning file " (.getAbsolutePath file))
