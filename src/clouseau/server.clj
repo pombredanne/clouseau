@@ -286,7 +286,7 @@
     (str
         "[Package]\n" package
         "\n\n[CCS Description]\n" ccs-description
-        "\n\n"))
+        "\n\n"
         (apply str
             (for [p package-descriptions]
                 (str "[" (key p) "]\n"
