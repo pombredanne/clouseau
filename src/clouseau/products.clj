@@ -59,6 +59,11 @@
          :subprotocol "sqlite"
          :subname     "packages/rhel67/primary.sqlite"
      }]
+     ["RHEL 6.7 High Availability"
+        {:classname   "org.sqlite.JDBC"
+         :subprotocol "sqlite"
+         :subname     "packages/rhel67_ha/primary.sqlite"
+     }]
      ["RHEL 7"
         {:classname   "org.sqlite.JDBC"
          :subprotocol "sqlite"
