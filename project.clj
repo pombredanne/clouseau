@@ -49,7 +49,8 @@
                  [org.clojure/java.jdbc "0.3.5"]
                  [org.xerial/sqlite-jdbc "3.7.2"]]
   :dev-dependencies [[lein-ring "0.8.10"]]
-  :plugins [[lein-ring "0.8.10"]]
+  :plugins [[lein-ring "0.8.10"]
+            [codox "0.8.11"]]
   :ring {:handler clouseau.core/app}
   :main clouseau.core)
 
