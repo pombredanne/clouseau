@@ -74,6 +74,11 @@
          :subprotocol "sqlite"
          :subname     "packages/rhel67_rs/primary.sqlite"
      }]
+     ["RHEL 6 Scalable File System"
+        {:classname   "org.sqlite.JDBC"
+         :subprotocol "sqlite"
+         :subname     "packages/rhel67_cfs/primary.sqlite"
+     }]
      ["RHEL 7"
         {:classname   "org.sqlite.JDBC"
          :subprotocol "sqlite"
