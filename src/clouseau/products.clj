@@ -36,9 +36,11 @@
 ;;; exception statement from your version.
 ;;; 
 
-(ns clouseau.products)
+(ns clouseau.products
+    "Module that contains database configurations for all products.")
 
 (def products [
+    "Database configurations for all products."
      ["Fedora 20"
         {:classname   "org.sqlite.JDBC"
          :subprotocol "sqlite"

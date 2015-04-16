@@ -1,0 +1,29 @@
+From bc216e9054329d8dbbc1665d709c8e2c82be6fbc Mon Sep 17 00:00:00 2001
+From: Pavel Tisnovsky <ptisnovs@redhat.com>
+Date: Thu, 2 Apr 2015 18:00:35 +0200
+Subject: [PATCH] Added comments to the following module: products.
+
+---
+ src/clouseau/products.clj |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
+
+diff --git a/src/clouseau/products.clj b/src/clouseau/products.clj
+index c4506df..bbc7ad8 100644
+--- a/src/clouseau/products.clj
++++ b/src/clouseau/products.clj
+@@ -36,9 +36,11 @@
+ ;;; exception statement from your version.
+ ;;; 
+ 
+-(ns clouseau.products)
++(ns clouseau.products
++    "Module that contains database configurations for all products.")
+ 
+ (def products [
++    "Database configurations for all products."
+      ["Fedora 20"
+         {:classname   "org.sqlite.JDBC"
+          :subprotocol "sqlite"
+-- 
+1.6.0.6
+
