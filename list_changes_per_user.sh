@@ -38,5 +38,5 @@
 # exception statement from your version.
 # 
 
-sqlite3 "changes.db" "select user_name, count(*) from changes group by user_name;"
+sqlite3 "changes.db" "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"
 
