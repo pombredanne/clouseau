@@ -117,6 +117,7 @@
             nil)))  ; special value that will be handled later
 
 (defn read-changes-statistic
+    "Read number of changes made by all users."
     []
     (try
         (jdbc/query changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
@@ -126,6 +127,7 @@
             nil)))  ; special value that will be handled later
 
 (defn read-changes
+    "Read all changes made by all users."
     []
     (try
         (jdbc/query changes-db (str "select * from changes order by id;"))
@@ -463,11 +465,13 @@
     (keys (filter #(nil? (val %)) package-descriptions)))
 
 (defn generate-error-message-package-db-error
+    "Generate error message that is thrown in case of any error during working with database."
     [package-descriptions]
     (let [error-products (package-error package-descriptions)]
         (str "Can not access following " (count error-products) " database" (if (> (count error-products) 1) "s" "") ": " (clojure.string/join ", " error-products))))
 
 (defn process
+    "Gather all required informations and send it back to user."
     [package new-description output-format new-user-name old-user-name]
     (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
         (store-ccs-description package new-description))
