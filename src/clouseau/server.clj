@@ -462,6 +462,7 @@
     (or new-user-name old-user-name))
 
 (defn generate-normal-response
+    "Generate server response in HTML format."
     [products package package-descriptions ccs-description
      products-per-description products-without-descriptions new-description user-name]
      (let [html-output (html-renderer products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
@@ -474,6 +475,7 @@
                 (http-response/content-type "text/html")))))
 
 (defn generate-txt-normal-response
+    "Generate server response in text format."
     [products package package-descriptions ccs-description
      products-per-description products-without-descriptions new-description user-name]
      (let [text-output (text-renderer products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
@@ -482,11 +484,13 @@
                 (http-response/content-type "text/plain"))))
 
 (defn generate-error-response
+    "Generate error message in HTML format in case any error occured in Clouseau."
     [package user-name message]
     (-> (http-response/response (render-error-page package user-name message))
         (http-response/content-type "text/html")))
 
 (defn generate-txt-error-response
+    "Generate error message in text/plain format in case any error occured in Clouseau."
     [package user-name message]
     (-> (http-response/response (str "Sorry, error occured in Clouseau:" message))
         (http-response/content-type "text/plain")))
