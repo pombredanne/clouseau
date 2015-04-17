@@ -136,6 +136,16 @@
             (println e)
             nil)))  ; special value that will be handled later
 
+(defn read-changes-for-user
+    "Read all changes made by specific user."
+    [user-name]
+    (try
+        (jdbc/query changes-db [(str "select * from changes where user_name=? order by id;") user-name])
+        (catch Exception e
+            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            (println e)
+            nil)))  ; special value that will be handled later
+
 (defn read-package-descriptions
     [products package]
     (zipmap
@@ -356,6 +366,30 @@
         ] ; </body>
     ))
 
+(defn html-renderer-user
+    [changes selected-user user-name]
+    (page/xhtml
+        (render-html-header nil)
+        [:body
+            [:div {:class "container"}
+                (render-navigation-bar-section nil user-name)
+                [:h2 "Changes made by" selected-user]
+                [:table {:class "table table-stripped table-hover" :style "width:auto"}
+                    [:tr [:th "ID"]
+                         [:th "Date"]
+                         [:th "Package"]
+                         [:th "Description"]]
+                    (for [change changes]
+                        [:tr [:td (:id change)]
+                             [:td (:date_time change)]
+                             [:td [:a {:href (str "/?package="  (:package change))} (:package change)]]
+                             [:td (:description change)]])
+                ]
+                (render-footer)
+            ] ; </div class="container">
+        ] ; </body>
+    ))
+
 (defn html-renderer-users
     [statistic changes user-name]
     (page/xhtml
@@ -367,7 +401,7 @@
                     [:tr [:th "User name"]
                          [:th "Changes made"]]
                     (for [stat statistic]
-                        [:tr [:td (:user_name stat)]
+                        [:tr [:td [:a {:href (str "user?name=" (:user_name stat))} (:user_name stat)]]
                              [:td (:cnt stat)]]
                     )
                 ]
@@ -381,8 +415,8 @@
                     (for [change changes]
                         [:tr [:td (:id change)]
                              [:td (:date_time change)]
-                             [:td (:package change)]
-                             [:td (:user_name change)]
+                             [:td [:a {:href (str "/?package="  (:package change))} (:package change)]]
+                             [:td [:a {:href (str "user?name=" (:user_name change))} (:user_name change)]]
                              [:td (:description change)]])
                 ]
                 (render-footer)
@@ -517,12 +551,24 @@
             (http-response/content-type "text/html"))))
 
 (defn render-users-info
-    "Create page containing user info(s)."
+    "Create page containing user info(s) for all users."
     [request]
     (let [changes-statistic (read-changes-statistic)
           changes           (read-changes)
-          user-name    (get (get (request :cookies) "user-name") :value)]
+          user-name         (get (get (request :cookies) "user-name") :value)]
         (-> (http-response/response (html-renderer-users changes-statistic changes user-name))
+            (http-response/content-type "text/html"))))
+
+(defn render-user-info
+    "Create page containing detailed informations about selected user."
+    [request]
+    (let [params        (request :params)
+          user-name     (get (get (request :cookies) "user-name") :value)
+          selected-user (get params "name")
+          changes       (read-changes-for-user selected-user)]
+          (println "User name: " selected-user)
+          ;(println "User made changes: " changes)
+        (-> (http-response/response (html-renderer-user changes selected-user user-name))
             (http-response/content-type "text/html"))))
 
 (defn return-file
@@ -548,5 +594,6 @@
             "/bootstrap.min.js"  (return-file "bootstrap.min.js" "application/javascript")
             "/"                  (perform-normal-processing request)
             "/descriptions"      (render-all-descriptions request)
-            "/users"             (render-users-info request))))
+            "/users"             (render-users-info request)
+            "/user"              (render-user-info request))))
 
