@@ -480,14 +480,15 @@
 (defn process
     "Gather all required informations and send it back to user."
     [package new-description output-format new-user-name old-user-name]
-    (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
-        (try
-            (store-ccs-description package new-description)
-            (generate-response package new-description output-format new-user-name old-user-name)
-            (catch Exception e
-                (println "Error writing into database 'ccs_descriptions.db':" e)
-                (generate-error-response package old-user-name (str "Can not write into database file 'ccs_descriptions.db': " e))))
-        (generate-response package new-description output-format new-user-name old-user-name)))
+    (let [trimmed-package-name (if package (clojure.string/trim package) nil)]
+        (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
+            (try
+                (store-ccs-description trimmed-package-name new-description)
+                (generate-response trimmed-package-name new-description output-format new-user-name old-user-name)
+                (catch Exception e
+                    (println "Error writing into database 'ccs_descriptions.db':" e)
+                    (generate-error-response trimmed-package-name old-user-name (str "Can not write into database file 'ccs_descriptions.db': " e))))
+            (generate-response trimmed-package-name new-description output-format new-user-name old-user-name))))
 
 (defn perform-normal-processing
     "Generates Clouseau main page."
