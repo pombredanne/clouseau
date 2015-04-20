@@ -47,39 +47,7 @@
 
 (require '[clouseau.products :as products])
 (require '[clouseau.calendar :as calendar])
-
-;
-; This database file contains table named 'ccs-description'.
-;
-; Table 'ccs-description' should have the following format:
-;    create table packages (
-;        name        text not null,
-;        description text not null
-;    );
-;
-(def ccs-db
-    {:classname   "org.sqlite.JDBC"
-     :subprotocol "sqlite"
-     :subname     "ccs_descriptions.db"
-    })
-
-;
-; This database file contains table named 'changes'.
-;
-; Table 'changes' should have the following format:
-;     create table changes (
-;         id          integer primary key asc,
-;         date_time   text,
-;         user_name   text,
-;         package     text,
-;         description text
-;     );
-;
-(def changes-db
-    {:classname   "org.sqlite.JDBC"
-     :subprotocol "sqlite"
-     :subname     "changes.db"
-    })
+(require '[clouseau.db-spec  :as db-spec])
 
 (defn println-and-flush
     "Original (println) has problem with syncing when it's called from more threads.
@@ -105,7 +73,7 @@
     "Read number of changes made by all users."
     []
     (try
-        (jdbc/query changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
+        (jdbc/query db-spec/changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
         (catch Exception e
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
             (println e)
@@ -115,7 +83,7 @@
     "Read all changes made by all users."
     []
     (try
-        (jdbc/query changes-db (str "select * from changes order by id;"))
+        (jdbc/query db-spec/changes-db (str "select * from changes order by id;"))
         (catch Exception e
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
             (println e)
@@ -125,7 +93,7 @@
     "Read all changes made by specific user."
     [user-name]
     (try
-        (jdbc/query changes-db [(str "select * from changes where user_name=? order by id;") user-name])
+        (jdbc/query db-spec/changes-db [(str "select * from changes where user_name=? order by id;") user-name])
         (catch Exception e
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
             (println e)
@@ -142,7 +110,7 @@
 (defn read-ccs-description
     [package]
     (try
-        (let [result (jdbc/query ccs-db (str "select description from packages where name='" package "';"))
+        (let [result (jdbc/query db-spec/ccs-db (str "select description from packages where name='" package "';"))
               desc   (:description (first result))]
             (if (not desc)
                 ""     ; special value that will be handled later
@@ -156,13 +124,13 @@
     []
     ; we need to use trim() here because some package names starts with one space or even with more spaces
     ; due to errors in the original database
-    (jdbc/query ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
+    (jdbc/query db-spec/ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
 
 (defn store-ccs-description
     "Store new ccs description into the table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     [package description]
-    (jdbc/delete! ccs-db :packages ["name = ?" package])
-    (jdbc/insert! ccs-db :packages {:name package :description description}))
+    (jdbc/delete! db-spec/ccs-db :packages ["name = ?" package])
+    (jdbc/insert! db-spec/ccs-db :packages {:name package :description description}))
 
 (defn not-empty-parameter?
     [parameter]
@@ -172,7 +140,7 @@
     [user-name package description]
     (if (and (not-empty-parameter? package) (not-empty-parameter? description))
         (let [date (calendar/format-date-time (calendar/get-calendar))]
-            (jdbc/insert! changes-db :changes {:date_time date :user_name user-name :package package :description description})
+            (jdbc/insert! db-spec/changes-db :changes {:date_time date :user_name user-name :package package :description description})
             (println-and-flush date user-name package)
         )))
 
