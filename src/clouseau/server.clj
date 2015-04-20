@@ -177,8 +177,7 @@
     "Store new ccs description into the table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     [package description]
     (jdbc/delete! ccs-db :packages ["name = ?" package])
-    (jdbc/insert! ccs-db :packages {:name package :description description})
-)
+    (jdbc/insert! ccs-db :packages {:name package :description description}))
 
 (defn not-empty-parameter?
     [parameter]
@@ -508,11 +507,8 @@
     (let [error-products (package-error package-descriptions)]
         (str "Can not access following " (count error-products) " database" (if (> (count error-products) 1) "s" "") ": " (clojure.string/join ", " error-products))))
 
-(defn process
-    "Gather all required informations and send it back to user."
+(defn generate-response
     [package new-description output-format new-user-name old-user-name]
-    (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
-        (store-ccs-description package new-description))
     (let [ccs-description               (read-ccs-description package)
           package-descriptions          (read-package-descriptions products/products package)
           products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
@@ -527,6 +523,18 @@
                            (package-error package-descriptions) (generate-txt-error-response package user-name (generate-error-message-package-db-error package-descriptions))
                            :else                                (generate-txt-normal-response products/products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name))
 )))
+
+(defn process
+    "Gather all required informations and send it back to user."
+    [package new-description output-format new-user-name old-user-name]
+    (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
+        (try
+            (store-ccs-description package new-description)
+            (generate-response package new-description output-format new-user-name old-user-name)
+            (catch Exception e
+                (println "Error writing into database 'ccs_descriptions.db':" e)
+                (generate-error-response package old-user-name (str "Can not write into database file 'ccs_descriptions.db': " e))))
+        (generate-response package new-description output-format new-user-name old-user-name)))
 
 (defn perform-normal-processing
     "Generates Clouseau main page."
