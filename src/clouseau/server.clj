@@ -46,6 +46,7 @@
 (require '[clojure.java.jdbc :as jdbc])
 
 (require '[clouseau.products :as products])
+(require '[clouseau.calendar :as calendar])
 
 ;
 ; This database file contains table named 'ccs-description'.
@@ -86,22 +87,6 @@
     [& more]
     (.write *out* (str (clojure.string/join " " more) "\n"))
     (flush))
-
-(defn get-calendar
-    "Gets a calendar using the default time zone and default locale."
-    []
-    (java.util.Calendar/getInstance))
-
-(defn format-date-using-desired-format
-    "Format given date using desired format, for example 'yyyy-MM-dd' etc."
-    [calendar desired-format]
-    (let [date-format (new java.text.SimpleDateFormat desired-format)]
-        (.format date-format (.getTime calendar))))
-
-(defn format-date-time
-    "Format given date using the following format: 'yyyy-MM-dd HH:mm:ss'"
-    [calendar]
-    (format-date-using-desired-format calendar "yyyy-MM-dd HH:mm:ss"))
 
 (defn read-description
     "Read description from the database for specified product and package."
@@ -186,7 +171,7 @@
 (defn store-changes
     [user-name package description]
     (if (and (not-empty-parameter? package) (not-empty-parameter? description))
-        (let [date (format-date-time (get-calendar))]
+        (let [date (calendar/format-date-time (calendar/get-calendar))]
             (jdbc/insert! changes-db :changes {:date_time date :user_name user-name :package package :description description})
             (println-and-flush date user-name package)
         )))
@@ -372,7 +357,7 @@
         [:body
             [:div {:class "container"}
                 (render-navigation-bar-section nil user-name)
-                [:h2 "Changes made by" selected-user]
+                [:h2 "Changes made by " selected-user]
                 [:table {:class "table table-stripped table-hover" :style "width:auto"}
                     [:tr [:th "ID"]
                          [:th "Date"]
