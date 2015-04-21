@@ -67,6 +67,9 @@
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-description(): error accessing database '" (:subname (second product)) "'!")
+            (println-and-flush e)
+            (.printStackTrace e)
+            (println "***********" package)
             nil)))  ; special value that will be handled later
 
 (defn read-changes-statistic
@@ -77,7 +80,7 @@
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes-statistic(): Error accessing database 'css_descriptions.db'!")
-            (println e)
+            (println-and-flush e)
             nil)))  ; special value that will be handled later
 
 (defn read-changes
@@ -88,7 +91,7 @@
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes(): Error accessing database 'css_descriptions.db'!")
-            (println e)
+            (println-and-flush e)
             nil)))  ; special value that will be handled later
 
 (defn read-changes-for-user
@@ -99,7 +102,7 @@
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes-for-user(): Error accessing database 'css_descriptions.db'!")
-            (println e)
+            (println-and-flush e)
             nil)))  ; special value that will be handled later
 
 (defn read-package-descriptions
@@ -120,6 +123,7 @@
                 desc)) ; (.replaceAll desc "\n" "<br />"))))
         (catch Exception e
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            (println-and-flush e)
             nil)))     ; special value that will be handled later
 
 (defn read-all-descriptions
