@@ -65,6 +65,7 @@
                 ""  ; special value that will be handled later
                 (.replaceAll desc "\n" "<br />")))
         (catch Exception e
+            ; print error message in case of any DB-related exception
             (println-and-flush "read-description(): error accessing database '" (:subname (second product)) "'!")
             nil)))  ; special value that will be handled later
 
@@ -74,7 +75,8 @@
     (try
         (jdbc/query db-spec/changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
         (catch Exception e
-            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            ; print error message in case of any DB-related exception
+            (println-and-flush "read-changes-statistic(): Error accessing database 'css_descriptions.db'!")
             (println e)
             nil)))  ; special value that will be handled later
 
@@ -84,7 +86,8 @@
     (try
         (jdbc/query db-spec/changes-db (str "select * from changes order by id;"))
         (catch Exception e
-            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            ; print error message in case of any DB-related exception
+            (println-and-flush "read-changes(): Error accessing database 'css_descriptions.db'!")
             (println e)
             nil)))  ; special value that will be handled later
 
@@ -94,7 +97,8 @@
     (try
         (jdbc/query db-spec/changes-db [(str "select * from changes where user_name=? order by id;") user-name])
         (catch Exception e
-            (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
+            ; print error message in case of any DB-related exception
+            (println-and-flush "read-changes-for-user(): Error accessing database 'css_descriptions.db'!")
             (println e)
             nil)))  ; special value that will be handled later
 
