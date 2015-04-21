@@ -72,6 +72,13 @@
             (println "***********" package)
             nil)))  ; special value that will be handled later
 
+(defn try-to-read-description
+    "Read package description, but only when package is specified."
+    [product package]
+    (if package
+        (read-description product package)
+        ""))
+
 (defn read-changes-statistic
     "Read number of changes made by all users."
     []
@@ -111,7 +118,7 @@
         (for [product products]
             (first product))
         (for [product products]
-            (read-description product package))))
+            (try-to-read-description product package))))
 
 (defn read-ccs-description
     [package]
@@ -125,6 +132,13 @@
             (println-and-flush "read-ccs-description(): Error accessing database 'css_descriptions.db'!")
             (println-and-flush e)
             nil)))     ; special value that will be handled later
+
+(defn try-to-read-ccs-description
+    "Read package CCS description, but only when package is specified."
+    [package]
+    (if package
+        (read-ccs-description package)
+        ""))
 
 (defn read-all-descriptions
     "Read all descriptions from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
@@ -476,7 +490,7 @@
 
 (defn generate-response
     [package new-description output-format new-user-name old-user-name]
-    (let [ccs-description               (read-ccs-description package)
+    (let [ccs-description               (try-to-read-ccs-description package)
           package-descriptions          (read-package-descriptions products/products package)
           products-without-descriptions (get-products-without-descriptions products/products package-descriptions)
           products-with-descriptions    (get-products-with-descriptions products/products package-descriptions)
