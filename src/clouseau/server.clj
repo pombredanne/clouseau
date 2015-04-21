@@ -39,11 +39,10 @@
 (ns clouseau.server)
 
 (require '[ring.util.response     :as http-response])
-(require '[hiccup.core :as hiccup])
-(require '[hiccup.page :as page])
-(require '[hiccup.form :as form])
-
-(require '[clojure.java.jdbc :as jdbc])
+(require '[hiccup.core            :as hiccup])
+(require '[hiccup.page            :as page])
+(require '[hiccup.form            :as form])
+(require '[clojure.java.jdbc      :as jdbc])
 
 (require '[clouseau.products :as products])
 (require '[clouseau.calendar :as calendar])
@@ -133,10 +132,12 @@
     (jdbc/insert! db-spec/ccs-db :packages {:name package :description description}))
 
 (defn not-empty-parameter?
+    "Returns true if given parameter is not null and not empty at the same time."
     [parameter]
     (and parameter (not (empty? parameter))))
 
 (defn store-changes
+    "Store changes into the 'changes' table."
     [user-name package description]
     (if (and (not-empty-parameter? package) (not-empty-parameter? description))
         (let [date (calendar/format-date-time (calendar/get-calendar))]
@@ -145,6 +146,7 @@
         )))
 
 (defn render-html-header
+    "Renders part of HTML page - the header."
     [package]
     [:head
         [:title "Clouseau   " package]
@@ -159,11 +161,13 @@
 )
 
 (defn render-footer
+    "Renders part of HTML page - the footer."
     []
     [:div "<br /><br /><br /><br />Author: Pavel Tisnovsky &lt;<a href='mailto:ptisnovs@redhat.com'>ptisnovs@redhat.com</a>&gt;&nbsp;&nbsp;&nbsp;"
           "<a href='https://mojo.redhat.com/message/955597'>RFE and general discussion about Clouseau in Mojo</a><br />"])
 
 (defn render-search-field
+    "Renders search box on the top side of HTML page."
     [package]
     (form/form-to {:class "navbar-form navbar-left" :role "search"} [:get "/" ]
         [:div {:class "input-group"}
@@ -173,6 +177,7 @@
                 (form/submit-button {:class "btn btn-default"} "Search")]]))
 
 (defn render-name-field
+    "Renders box for typing user name on the top side of HTML page."
     [user-name]
     (form/form-to {:class "navbar-form navbar-left" :role "search"} [:get "/" ]
         [:div {:class "input-group"}
@@ -182,6 +187,7 @@
                 (form/submit-button {:class "btn btn-default"} "Remember me")]]))
 
 (defn render-navigation-bar-section
+    "Renders whole navigation bar."
     [package user-name]
     [:nav {:class "navbar navbar-inverse navbar-fixed-top" :role "navigation"}
         [:div {:class "container-fluid"}
