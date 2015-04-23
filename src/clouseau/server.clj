@@ -59,7 +59,7 @@
     "Read description from the database for specified product and package."
     [product package]
     (try
-        (let [result (jdbc/query (second product) (str "select description from packages where name='" package "';"))
+        (let [result (jdbc/query (second product) (str "select description from packages where lower(name)='" (clojure.string/lower-case package) "';"))
               desc   (:description (first result))]
             (if (not desc)
                 ""  ; special value that will be handled later
@@ -123,7 +123,7 @@
 (defn read-ccs-description
     [package]
     (try
-        (let [result (jdbc/query db-spec/ccs-db (str "select description from packages where name='" package "';"))
+        (let [result (jdbc/query db-spec/ccs-db (str "select description from packages where lower(name)='" (clojure.string/lower-case package) "';"))
               desc   (:description (first result))]
             (if (not desc)
                 ""     ; special value that will be handled later
