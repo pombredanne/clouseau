@@ -42,13 +42,12 @@
 (require '[hiccup.core            :as hiccup])
 (require '[hiccup.page            :as page])
 (require '[hiccup.form            :as form])
-(require '[clojure.java.jdbc      :as jdbc])
 
 (require '[clouseau.products      :as products])
 (require '[clouseau.calendar      :as calendar])
-(require '[clouseau.db-spec       :as db-spec])
 (require '[clouseau.html-renderer :as html-renderer])
 (require '[clouseau.text-renderer :as text-renderer])
+(require '[clouseau.db-interface  :as db-interface])
 
 (defn println-and-flush
     "Original (println) has problem with syncing when it's called from more threads.
@@ -61,7 +60,7 @@
     "Read description from the database for specified product and package."
     [product package]
     (try
-        (let [result (jdbc/query (second product) (str "select description from packages where lower(name)='" (clojure.string/lower-case package) "';"))
+        (let [result (db-interface/read-description product package)
               desc   (:description (first result))]
             (if (not desc)
                 ""  ; special value that will be handled later
@@ -85,7 +84,7 @@
     "Read number of changes made by all users."
     []
     (try
-        (jdbc/query db-spec/changes-db (str "select user_name, count(*) as cnt from changes group by user_name order by cnt desc;"))
+        (db-interface/read-changes-statistic)
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes-statistic(): Error accessing database 'css_descriptions.db'!")
@@ -96,7 +95,7 @@
     "Read all changes made by all users."
     []
     (try
-        (jdbc/query db-spec/changes-db (str "select * from changes order by id;"))
+        (db-interface/read-changes)
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes(): Error accessing database 'css_descriptions.db'!")
@@ -107,7 +106,7 @@
     "Read all changes made by specific user."
     [user-name]
     (try
-        (jdbc/query db-spec/changes-db [(str "select * from changes where user_name=? order by id;") user-name])
+        (db-interface/read-changes-for-user user-name)
         (catch Exception e
             ; print error message in case of any DB-related exception
             (println-and-flush "read-changes-for-user(): Error accessing database 'css_descriptions.db'!")
@@ -125,7 +124,7 @@
 (defn read-ccs-description
     [package]
     (try
-        (let [result (jdbc/query db-spec/ccs-db (str "select description from packages where lower(name)='" (clojure.string/lower-case package) "';"))
+        (let [result (db-interface/read-ccs-description package)
               desc   (:description (first result))]
             (if (not desc)
                 ""     ; special value that will be handled later
@@ -145,15 +144,12 @@
 (defn read-all-descriptions
     "Read all descriptions from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     []
-    ; we need to use trim() here because some package names starts with one space or even with more spaces
-    ; due to errors in the original database
-    (jdbc/query db-spec/ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
+    (db-interface/read-all-descriptions))
 
 (defn store-ccs-description
     "Store new ccs description into the table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     [package description]
-    (jdbc/delete! db-spec/ccs-db :packages ["name = ?" package])
-    (jdbc/insert! db-spec/ccs-db :packages {:name package :description description}))
+    (db-interface/store-ccs-description package description))
 
 (defn not-empty-parameter?
     "Returns true if given parameter is not null and not empty at the same time."
@@ -165,7 +161,7 @@
     [user-name package description]
     (if (and (not-empty-parameter? package) (not-empty-parameter? description))
         (let [date (calendar/format-date-time (calendar/get-calendar))]
-            (jdbc/insert! db-spec/changes-db :changes {:date_time date :user_name user-name :package package :description description})
+            (db-interface/store-changes user-name package description date)
             (println-and-flush date user-name package)
         )))
 
