@@ -182,7 +182,7 @@
     ] ; head
 )
 
-(defn render-footer
+(defn render-html-footer
     "Renders part of HTML page - the footer."
     []
     [:div "<br /><br /><br /><br />Author: Pavel Tisnovsky &lt;<a href='mailto:ptisnovs@redhat.com'>ptisnovs@redhat.com</a>&gt;&nbsp;&nbsp;&nbsp;"
@@ -259,7 +259,7 @@
                     [:button {:class "btn btn-primary" :onclick "window.history.back()" :type "button"} "Back"]
                 ]
                 [:br][:br][:br][:br]
-                (render-footer)
+                (render-html-footer)
             ] ; </div class="container">
         ] ; </body>
     ))
@@ -325,7 +325,7 @@
                         [:div {:class "alert alert-danger"} "Not found"]]
                     )
 
-                (render-footer)
+                (render-html-footer)
             ] ; </div class="container">
         ] ; </body>
     ))
@@ -341,7 +341,7 @@
                         [:div [:div {:class "label label-warning"} [:a {:href (str "../?package=" (get description :name) ) } (get description :name)]]
                               [:div {:class "alert alert-success"} (.replaceAll (str "" (get description :description)) "\\n" "<br />")]]
                     )
-                (render-footer)
+                (render-html-footer)
             ] ; </div class="container">
         ] ; </body>
     ))
@@ -365,7 +365,7 @@
                              [:td [:a {:href (str "/?package="  (:package change))} (:package change)]]
                              [:td (:description change)]])
                 ]
-                (render-footer)
+                (render-html-footer)
             ] ; </div class="container">
         ] ; </body>
     ))
@@ -399,7 +399,7 @@
                              [:td [:a {:href (str "user?name=" (:user_name change))} (:user_name change)]]
                              [:td (:description change)]])
                 ]
-                (render-footer)
+                (render-html-footer)
             ] ; </div class="container">
         ] ; </body>
     ))
