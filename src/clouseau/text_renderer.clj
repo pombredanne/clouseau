@@ -38,4 +38,15 @@
 
 (ns clouseau.text-renderer)
 
+(defn render-front-page
+    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
+    (str
+        "[Package]\n" package
+        "\n\n[CCS Description]\n" ccs-description
+        "\n\n"
+        (apply str
+            (for [p package-descriptions]
+                (str "[" (key p) "]\n"
+                         (val p) "\n\n")
+            ))))
 

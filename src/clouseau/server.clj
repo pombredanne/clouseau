@@ -48,6 +48,7 @@
 (require '[clouseau.calendar      :as calendar])
 (require '[clouseau.db-spec       :as db-spec])
 (require '[clouseau.html-renderer :as html-renderer])
+(require '[clouseau.text-renderer :as text-renderer])
 
 (defn println-and-flush
     "Original (println) has problem with syncing when it's called from more threads.
@@ -168,18 +169,6 @@
             (println-and-flush date user-name package)
         )))
 
-(defn text-renderer
-    [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]
-    (str
-        "[Package]\n" package
-        "\n\n[CCS Description]\n" ccs-description
-        "\n\n"
-        (apply str
-            (for [p package-descriptions]
-                (str "[" (key p) "]\n"
-                         (val p) "\n\n")
-            ))))
-
 (defn log-request-information
     [request]
     (println-and-flush "time:        " (.toString (new java.util.Date)))
@@ -234,7 +223,7 @@
     "Generate server response in text format."
     [products package package-descriptions ccs-description
      products-per-description products-without-descriptions new-description user-name]
-     (let [text-output (text-renderer products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
+     (let [text-output (text-renderer/render-front-page products package package-descriptions ccs-description products-per-description products-without-descriptions new-description user-name)]
         (store-changes user-name package new-description)
             (-> (http-response/response text-output)
                 (http-response/content-type "text/plain"))))
