@@ -47,6 +47,8 @@
 
 (require '[clouseau.server         :as server])
 
+(def default-port
+    "3000")
 
 (def cli-options
     ;; an option with a required argument
@@ -67,7 +69,9 @@
 (defn get-port
     "Returns specified port or default port if none is specified on the command line."
     [specified-port]
-    (or specified-port "3000"))
+    (if (or (not specified-port) (empty? specified-port))
+        default-port
+        specified-port))
 
 (defn -main
     "Entry point to the Clouseau server."
