@@ -39,9 +39,6 @@
 (ns clouseau.server)
 
 (require '[ring.util.response     :as http-response])
-(require '[hiccup.core            :as hiccup])
-(require '[hiccup.page            :as page])
-(require '[hiccup.form            :as form])
 
 (require '[clouseau.products      :as products])
 (require '[clouseau.calendar      :as calendar])
