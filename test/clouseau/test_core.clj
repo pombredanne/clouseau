@@ -121,3 +121,11 @@
         (is (= (get-and-check-port "65534") "65534"))
         (is (= (get-and-check-port "65535") "65535"))))
 
+(deftest test-get-and-check-port-negative
+    "Check the function clouseau.core/get-and-check-port."
+    (testing "the function clouseau.core/get-and-check-port."
+        (is (thrown? AssertionError (get-and-check-port "-1")))
+        (is (thrown? AssertionError (get-and-check-port "0")))
+        (is (thrown? AssertionError (get-and-check-port "65536")))
+        (is (thrown? AssertionError (get-and-check-port "1000000")))))
+
