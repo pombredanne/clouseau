@@ -68,6 +68,11 @@
     (testing "if the clouseau.core/get-port definition exists."
         (is (callable? 'clouseau.core/get-port))))
 
+(deftest test-get-and-check-port-existence
+    "Check that the clouseau.core/get-and-check-port definition exists."
+    (testing "if the clouseau.core/get-and-check-port definition exists."
+        (is (callable? 'clouseau.core/get-and-check-port))))
+
 (deftest test-cli-options-def-existence
     "Check that the clouseau.core/cli-options definition exists."
     (testing "if the hostname def exists"
@@ -94,7 +99,8 @@
     "Check the function clouseau.core/get-port."
     (testing "the function clouseau.core/get-port."
         (is (= (get-port nil)    "3000"))
-        (is (= (get-port "")    "3000"))
+        (is (= (get-port "")     "3000"))
         (is (= (get-port "1")    "1"))
+        (is (= (get-port 1)      "3000"))
         (is (= (get-port "3000") "3000"))))
 
