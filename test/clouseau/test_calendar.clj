@@ -36,7 +36,7 @@
 ;;; exception statement from your version.
 ;;; 
 
-(ns clouseau.test-core
+(ns clouseau.test-calendar
   (:require [clojure.test :refer :all]
             [clouseau.calendar :refer :all]))
 
@@ -55,17 +55,17 @@
 ;
 
 (deftest test-get-calendar-existence
-    "Check that the errata-summary.calendar/get-calendar definition exists."
-    (testing "if the errata-summary.calendar/get-calendar definition exists."
-        (is (callable? 'errata-summary.calendar/get-calendar))))
+    "Check that the clouseau.calendar/get-calendar definition exists."
+    (testing "if the clouseau.calendar/get-calendar definition exists."
+        (is (callable? 'clouseau.calendar/get-calendar))))
 
-(deftest test-format-data-using-desired-format-existence
-    "Check that the errata-summary.calendar/format-data-using-desired-format definition exists."
-    (testing "if the errata-summary.calendar/format-data-using-desired-format definition exists."
-        (is (callable? 'errata-summary.calendar/format-data-using-desired-format))))
+(deftest test-format-date-using-desired-format-existence
+    "Check that the clouseau.calendar/format-date-using-desired-format definition exists."
+    (testing "if the clouseau.calendar/format-date-using-desired-format definition exists."
+        (is (callable? 'clouseau.calendar/format-date-using-desired-format))))
 
 (deftest test-format-date-time-existence
-    "Check that the errata-summary.calendar/format-date-time definition exists."
-    (testing "if the errata-summary.calendar/format-date-time definition exists."
-        (is (callable? 'errata-summary.calendar/format-date-time))))
+    "Check that the clouseau.calendar/format-date-time definition exists."
+    (testing "if the clouseau.calendar/format-date-time definition exists."
+        (is (callable? 'clouseau.calendar/format-date-time))))
 
