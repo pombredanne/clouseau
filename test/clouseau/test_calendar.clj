@@ -41,3 +41,31 @@
             [clouseau.calendar :refer :all]))
 
 
+;
+; Common functions used by tests.
+;
+
+(defn callable?
+    "Test if given function-name is bound to the real function."
+    [function-name]
+    (clojure.test/function? function-name))
+
+;
+; Tests for various functions
+;
+
+(deftest test-get-calendar-existence
+    "Check that the errata-summary.calendar/get-calendar definition exists."
+    (testing "if the errata-summary.calendar/get-calendar definition exists."
+        (is (callable? 'errata-summary.calendar/get-calendar))))
+
+(deftest test-format-data-using-desired-format-existence
+    "Check that the errata-summary.calendar/format-data-using-desired-format definition exists."
+    (testing "if the errata-summary.calendar/format-data-using-desired-format definition exists."
+        (is (callable? 'errata-summary.calendar/format-data-using-desired-format))))
+
+(deftest test-format-date-time-existence
+    "Check that the errata-summary.calendar/format-date-time definition exists."
+    (testing "if the errata-summary.calendar/format-date-time definition exists."
+        (is (callable? 'errata-summary.calendar/format-date-time))))
+
