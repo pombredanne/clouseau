@@ -67,6 +67,10 @@
     ; due to errors in the original database
     (jdbc/query db-spec/ccs-db (str "select trim(name) as name, description from packages order by trim(name);")))
 
+(defn read-all-packages-provided-by-ccs
+    []
+    (jdbc/query db-spec/ccs-db (str "select name, description from packages order by name;")))
+
 (defn store-ccs-description
     [package description]
     (jdbc/delete! db-spec/ccs-db :packages ["name = ?" package])

@@ -267,3 +267,25 @@
         ] ; </body>
     ))
 
+(defn render-admin-interface
+    [packages user-name]
+    (page/xhtml
+        (render-html-header nil)
+        [:body
+            [:div {:class "container"}
+                (render-navigation-bar-section nil user-name)
+                    (for [package packages]
+                        [:div [:div {:class "label label-warning"} [:a {:href (str "../?package=" (get package :name) ) } (str "\"" (get package :name) "\"")]]
+                              " "
+                              [:div {:class "label"}  [:a {:href (str "/delete?package=" (get package :name) ) } "Delete"]]
+                              " "
+                              [:div {:class "label"}  [:a {:href (str "/trim?package=" (get package :name) ) } "Trim name"]]
+                              " "
+                              [:div {:class "label"}  [:a {:href (str "/lowercase?package=" (get package :name) ) } "Lowercase name"]]
+                              [:div {:class "alert alert-success"} (.replaceAll (str "" (get package :description)) "\\n" "<br />")]]
+                    )
+                (render-html-footer)
+            ] ; </div class="container">
+        ] ; </body>
+    ))
+

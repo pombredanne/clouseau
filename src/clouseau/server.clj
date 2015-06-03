@@ -143,6 +143,11 @@
     []
     (db-interface/read-all-descriptions))
 
+(defn read-all-packages-provided-by-ccs
+    "Read all packages from a table 'ccs-db' stored in a file 'ccs_descriptions.db'."
+    []
+    (db-interface/read-all-packages-provided-by-ccs))
+
 (defn store-ccs-description
     "Store new ccs description into the table 'ccs-db' stored in a file 'ccs_descriptions.db'."
     [package description]
@@ -323,6 +328,24 @@
           ;(println "User made changes: " changes)
         (-> (http-response/response (html-renderer/render-user changes selected-user user-name))
             (http-response/content-type "text/html"))))
+
+(defn render-admin-interface
+    "Created admin interface page."
+    [request operation]
+    (let [params           (request :params)
+          user-name        (get (get (request :cookies) "user-name") :value)
+          selected-package (get params "package")]
+          (println "Selected package " selected-package)
+          (println "Operation        " operation)
+          (case operation
+                :delete    (delete-package    selected-package)
+                :trim      (trim-package-name selected-package)
+                :lowercase (lowercase-package-name selected-package)
+                :none      nil)
+          (let [packages    (read-all-packages-provided-by-ccs)]
+              (println "Packages         " (count packages))
+              (-> (http-response/response (html-renderer/render-admin-interface packages user-name))
+                  (http-response/content-type "text/html")))))
 
 (defn return-file
     "Creates HTTP response containing content of specified file.
