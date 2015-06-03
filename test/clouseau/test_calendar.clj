@@ -69,3 +69,28 @@
     (testing "if the clouseau.calendar/format-date-time definition exists."
         (is (callable? 'clouseau.calendar/format-date-time))))
 
+;
+; Tests for function behaviours
+;
+
+(deftest test-get-calendar
+    "Check the function clouseau.calendar/get-calendar."
+    (testing "the function clouseau.calendar/get-calendar." 
+        (is (not (nil? (get-calendar))))
+        (is (or
+            (=  (class (get-calendar)) java.util.Calendar)
+            (=  (class (get-calendar)) java.util.GregorianCalendar)))
+        (is (or
+            (=  (type  (get-calendar)) java.util.Calendar)
+            (=  (type  (get-calendar)) java.util.GregorianCalendar)))
+        (is (>  (.get (get-calendar) (java.util.Calendar/YEAR)) 2000))
+        (is (>= (.get (get-calendar) (java.util.Calendar/MONTH)) 0))
+        (is (<  (.get (get-calendar) (java.util.Calendar/MONTH)) 12))
+        (is (>= (.get (get-calendar) (java.util.Calendar/DAY_OF_MONTH)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/DAY_OF_MONTH)) 31)) ; let's be on the safe side
+        (is (>= (.get (get-calendar) (java.util.Calendar/DAY_OF_YEAR)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/DAY_OF_YEAR)) 366)) ; let's be on the safe side
+        (is (>= (.get (get-calendar) (java.util.Calendar/WEEK_OF_YEAR)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/WEEK_OF_YEAR)) 54)) ; let's be on the safe side
+))
+
