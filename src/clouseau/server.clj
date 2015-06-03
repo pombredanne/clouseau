@@ -269,7 +269,8 @@
     (let [trimmed-package-name (if package (clojure.string/trim package) nil)]
         (if (and (not-empty-parameter? package) (not-empty-parameter? new-description))
             (try
-                (store-ccs-description trimmed-package-name new-description)
+                ; we need to use lowercase package name to avoid issue #66
+                (store-ccs-description (clojure.string/lower-case trimmed-package-name) new-description)
                 (generate-response trimmed-package-name new-description output-format new-user-name old-user-name)
                 (catch Exception e
                     (println "Error writing into database 'ccs_descriptions.db':" e)
