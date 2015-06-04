@@ -88,3 +88,7 @@
     [package]
     (jdbc/update! db-spec/ccs-db :packages {:name (clojure.string/trim package)} ["name=?" package]))
 
+(defn lowercase-package-in-ccs-description
+    [package]
+    (jdbc/update! db-spec/ccs-db :packages {:name (clojure.string/lower-case package)} ["name=?" package]))
+

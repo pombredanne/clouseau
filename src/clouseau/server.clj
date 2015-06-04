@@ -175,6 +175,10 @@
     [package-name]
     (db-interface/trim-package-in-ccs-description package-name))
 
+(defn lowercase-package-name
+    [package-name]
+    (db-interface/lowercase-package-in-ccs-description package-name))
+
 (defn log-request-information
     [request]
     (println-and-flush "time:        " (.toString (new java.util.Date)))
@@ -383,5 +387,6 @@
             "/admin"             (render-admin-interface request :none)
             "/delete"            (render-admin-interface request :delete)
             "/trim"              (render-admin-interface request :trim)
+            "/lowercase"         (render-admin-interface request :lowercase)
             )))
 
