@@ -84,3 +84,7 @@
     [package]
     (jdbc/delete! db-spec/ccs-db :packages ["name = ?" package]))
 
+(defn trim-package-in-ccs-description
+    [package]
+    (jdbc/update! db-spec/ccs-db :packages {:name (clojure.string/trim package)} ["name=?" package]))
+
