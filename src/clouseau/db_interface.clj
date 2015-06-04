@@ -80,3 +80,7 @@
     [user-name package description date]
     (jdbc/insert! db-spec/changes-db :changes {:date_time date :user_name user-name :package package :description description}))
 
+(defn delete-package-from-ccs-description
+    [package]
+    (jdbc/delete! db-spec/ccs-db :packages ["name = ?" package]))
+

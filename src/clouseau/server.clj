@@ -167,6 +167,10 @@
             (println-and-flush date user-name package)
         )))
 
+(defn delete-package
+    [package-name]
+    (db-interface/delete-package-from-ccs-description package-name))
+
 (defn log-request-information
     [request]
     (println-and-flush "time:        " (.toString (new java.util.Date)))
@@ -371,5 +375,8 @@
             "/"                  (perform-normal-processing request)
             "/descriptions"      (render-all-descriptions request)
             "/users"             (render-users-info request)
-            "/user"              (render-user-info request))))
+            "/user"              (render-user-info request)
+            "/admin"             (render-admin-interface request :none)
+            "/delete"            (render-admin-interface request :delete)
+            )))
 
