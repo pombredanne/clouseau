@@ -111,3 +111,10 @@
             (is (=  (.get calendar (java.util.Calendar/DAY_OF_MONTH)) 1)))
 ))
 
+(deftest test-format-date-using-desired-format
+    "Check the function clouseau.calendar/format-date-using-desired-format"
+    (testing "the function clouseau.calendar/format-date-using-desired-format." 
+        (let [calendar (get-calendar)]
+            (.set calendar 2000 01 01 10 20 30)
+)))
+
