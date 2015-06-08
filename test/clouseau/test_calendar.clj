@@ -94,3 +94,20 @@
         (is (<= (.get (get-calendar) (java.util.Calendar/WEEK_OF_YEAR)) 54)) ; let's be on the safe side
 ))
 
+(deftest test-get-calendar-2
+    "Check the function clouseau.calendar/get-calendar."
+    (testing "the function clouseau.calendar/get-calendar." 
+        (let [calendar (get-calendar)]
+            (.set calendar 2000 01 01 10 20 30)
+            (is (not (nil? calendar)))
+            (is (or
+                (=  (class calendar) java.util.Calendar)
+                (=  (class calendar) java.util.GregorianCalendar)))
+            (is (or
+                (=  (type  calendar) java.util.Calendar)
+                (=  (type  calendar) java.util.GregorianCalendar)))
+            (is (=  (.get calendar (java.util.Calendar/YEAR)) 2000))
+            (is (=  (.get calendar (java.util.Calendar/MONTH)) 1))
+            (is (=  (.get calendar (java.util.Calendar/DAY_OF_MONTH)) 1)))
+))
+
