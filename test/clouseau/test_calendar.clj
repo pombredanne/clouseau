@@ -123,3 +123,13 @@
             (is (= "20"   (format-date-using-desired-format calendar "mm")))
             (is (= "30"   (format-date-using-desired-format calendar "ss"))))))
 
+(deftest test-format-date-using-desired-format-2
+    "Check the function clouseau.calendar/format-date-using-desired-format"
+    (testing "the function clouseau.calendar/format-date-using-desired-format." 
+        (let [calendar (get-calendar)]
+            (.set calendar 2000 01 01 10 20 30)
+            (is (= "2000-02"    (format-date-using-desired-format calendar "yyyy-MM")))
+            (is (= "2000-02-01" (format-date-using-desired-format calendar "yyyy-MM-dd")))
+            (is (= "02-01"      (format-date-using-desired-format calendar "MM-dd")))
+            (is (= "2000-01"    (format-date-using-desired-format calendar "yyyy-dd"))))))
+
