@@ -51,7 +51,8 @@
     :dev-dependencies [[lein-ring "0.8.10"]]
     :plugins [[lein-ring "0.8.10"]
               [codox "0.8.11"]
-              [test2junit "1.1.0"]]
+              [test2junit "1.1.0"]
+              [lein-cloverage "1.0.2"]]
     :ring {:handler clouseau.core/app}
     :main clouseau.core)
 
