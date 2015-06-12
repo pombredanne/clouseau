@@ -47,6 +47,16 @@
          :subprotocol "sqlite"
          :subname     "packages/f20/primary.sqlite"
      }]
+     ["Fedora 21"
+        {:classname   "org.sqlite.JDBC"
+         :subprotocol "sqlite"
+         :subname     "packages/f21/primary.sqlite"
+     }]
+     ["Fedora 22"
+        {:classname   "org.sqlite.JDBC"
+         :subprotocol "sqlite"
+         :subname     "packages/f22/primary.sqlite"
+     }]
      ["RHEL 6"
         {:classname   "org.sqlite.JDBC"
          :subprotocol "sqlite"
