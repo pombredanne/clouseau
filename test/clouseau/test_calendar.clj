@@ -111,6 +111,22 @@
             (is (=  (.get calendar (java.util.Calendar/DAY_OF_MONTH)) 1)))
 ))
 
+(deftest test-get-calendar-3
+    "Check the function clouseau.calendar/get-calendar."
+    (testing "the function clouseau.calendar/get-calendar." 
+        (is (not (nil? (get-calendar))))
+        (is (>= (.get (get-calendar) (java.util.Calendar/HOUR)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/HOUR)) 11))
+        (is (>= (.get (get-calendar) (java.util.Calendar/HOUR_OF_DAY)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/HOUR_OF_DAY)) 23))
+        (is (>= (.get (get-calendar) (java.util.Calendar/MINUTE)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/MINUTE)) 59))
+        (is (>= (.get (get-calendar) (java.util.Calendar/SECOND)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/SECOND)) 59))
+        (is (>= (.get (get-calendar) (java.util.Calendar/MILLISECOND)) 0))
+        (is (<= (.get (get-calendar) (java.util.Calendar/MILLISECOND)) 999))
+))
+
 (deftest test-format-date-using-desired-format
     "Check the function clouseau.calendar/format-date-using-desired-format"
     (testing "the function clouseau.calendar/format-date-using-desired-format." 
