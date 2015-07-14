@@ -4,6 +4,19 @@ local repoTable ={
 local names = {
 }
 
+
+
+--
+-- Tests if the given string ends with the specified suffix.
+--
+function string.endsWith(str, suffix)
+    local substring = string.sub(str, -string.len(suffix))
+    return suffix == "" or substring == suffix
+end
+
+
+
+
 --- Function which compose command and run it. This command
 --  will check whether some file or directory exists or whether it is
 --  readable or writeable.
@@ -195,11 +208,34 @@ end
 -- @param db_file_path Path to the file where should be database unziped.
 -- @return Returns true if everything goes well. Otherwise, returns false.
 function downloadAndUnzipDB(db_link, db_file_path)
-  if not downloadFile(db_link, db_file_path .. ".bz2") then
-    return false
-  else
-    -- Compose command for unziping database and remove unuseful file.
-    unzip_command = "bunzip2 -c \"" .. db_file_path .. ".bz2\" > \"" .. db_file_path .. "\" && rm -f \"" .. db_file_path .. ".bz2\""
+    local downloadBZ2   = db_link:endsWith(".bz2")
+    local downloadXZ    = db_link:endsWith(".xz")
+    local unzip_command = nil
+    local downloaded    = nil
+
+    if downloadBZ2 then
+        downloaded = downloadFile(db_link, db_file_path .. ".bz2")
+    elseif downloadXZ then
+        downloaded = downloadFile(db_link, db_file_path .. ".xz")
+    else
+        print("Don't know which file to download, exiting")
+    end
+
+    if not downloaded then
+        fail("Download failed")
+        return false
+    end
+
+    if downloadBZ2 then
+        -- Compose command for unziping database and remove unuseful file.
+        unzip_command = "bunzip2 -c \"" .. db_file_path .. ".bz2\" > \"" .. db_file_path .. "\" && rm -f \"" .. db_file_path .. ".bz2\""
+    elseif downloadXZ then
+        -- Compose command for unziping database and remove unuseful file.
+        unzip_command = "unxz -c \"" .. db_file_path .. ".xz\" > \"" .. db_file_path .. "\" && rm -f \"" .. db_file_path .. ".xz\""
+    else -- not needed :)
+        fail("Download failed")
+        return false
+    end
 
     -- Execute command.
     file_handle_unzip = assert(io.popen(unzip_command))
@@ -209,11 +245,10 @@ function downloadAndUnzipDB(db_link, db_file_path)
 
     -- Check whether file was unziped correctly.
     if not checkFile(db_file_path, "er") then
-      fail("Database file doesn't exist.")
-      return false
+        fail("Database file doesn't exist.")
+        return false
     end
-  end
-  return true
+    return true
 end
 
 --- Function which compare found packages with available packages
