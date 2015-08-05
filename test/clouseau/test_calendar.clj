@@ -181,3 +181,17 @@
             (.set calendar 2000 00 31 10 20 30)
             (is (= "2000-01-31 10:20:30" (format-date-time calendar))))))
 
+(deftest test-format-date-time-4
+    "Check the function clouseau.calendar/format-date-time"
+    (testing "the function clouseau.calendar/format-date-time" 
+        (let [calendar (get-calendar)]
+            (.set calendar 2000 11 31 10 20 30)
+            (is (= "2000-12-31 10:20:30" (format-date-time calendar))))))
+
+(deftest test-format-date-time-5
+    "Check the function clouseau.calendar/format-date-time"
+    (testing "the function clouseau.calendar/format-date-time" 
+        (let [calendar (get-calendar)]
+            (.set calendar 2000 00 01 00 00 00)
+            (is (= "2000-01-01 00:00:00" (format-date-time calendar))))))
+
