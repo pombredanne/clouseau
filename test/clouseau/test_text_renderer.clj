@@ -36,7 +36,30 @@
 ;;; exception statement from your version.
 ;;; 
 
-(ns clouseau.test-core
+(ns clouseau.test-text-renderer
   (:require [clojure.test :refer :all]
             [clouseau.text-renderer :refer :all]))
+
+;
+; Common functions used by tests.
+;
+
+(defn callable?
+    "Test if given function-name is bound to the real function."
+    [function-name]
+    (clojure.test/function? function-name))
+
+;
+; Tests for existence of various functions
+;
+
+(deftest test-render-front-page-existence
+    "Check that the clouseau.text-renderer/render-front-page definition exists."
+    (testing "if the clouseau.text-renderer/render-front-page definition exists."
+        (is (callable? 'clouseau.text-renderer/render-front-page))))
+
+(deftest test-render-package-descriptions-existence
+    "Check that the clouseau.text-renderer/render-package-descriptions definition exists."
+    (testing "if the clouseau.text-renderer/render-package-descriptions definition exists."
+        (is (callable? 'clouseau.text-renderer/render-package-descriptions))))
 
