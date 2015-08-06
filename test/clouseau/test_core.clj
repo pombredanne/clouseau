@@ -98,12 +98,21 @@
 (deftest test-get-port
     "Check the function clouseau.core/get-port."
     (testing "the function clouseau.core/get-port."
+        (is (= (get-port "1")     "1"))
+        (is (= (get-port "2")     "2"))
+        (is (= (get-port "3000")  "3000"))
+        (is (= (get-port "65534") "65534"))
+        (is (= (get-port "65535") "65535"))))
+
+(deftest test-get-port-special-cases
+    "Check the function clouseau.core/get-port."
+    (testing "the function clouseau.core/get-port."
         (is (= (get-port nil)     "3000"))
         (is (= (get-port "")      "3000"))
-        (is (= (get-port "1")     "1"))
+        (is (= (get-port 0)       "3000"))
         (is (= (get-port 1)       "3000"))
-        (is (= (get-port "3000")  "3000"))
-        (is (= (get-port "65535") "65535"))))
+        (is (= (get-port 65535)   "3000"))
+        (is (= (get-port 65536)   "3000"))))
 
 (deftest test-get-port-negative
     "Check the function clouseau.core/get-port."
