@@ -40,4 +40,41 @@
   (:require [clojure.test :refer :all]
             [clouseau.db-interface :refer :all]))
 
+;
+; Common functions used by tests.
+;
+
+(defn callable?
+    "Test if given function-name is bound to the real function."
+    [function-name]
+    (clojure.test/function? function-name))
+
+;
+; Tests for various functions
+;
+
+(deftest test-read-description-existence
+    "Check that the clouseau.db-interface/read-description definition exists."
+    (testing "if the clouseau.db-interface/read-description definition exists."
+        (is (callable? 'clouseau.db-interface/read-description))))
+
+(deftest test-read-changes-statistic-existence
+    "Check that the clouseau.db-interface/read-changes-statistic definition exists."
+    (testing "if the clouseau.db-interface/read-changes-statistic definition exists."
+        (is (callable? 'clouseau.db-interface/read-changes-statistic))))
+
+(deftest test-read-changes-existence
+    "Check that the clouseau.db-interface/read-changes definition exists."
+    (testing "if the clouseau.db-interface/read-changes definition exists."
+        (is (callable? 'clouseau.db-interface/read-changes))))
+
+(deftest test-read-changes-for-user-existence
+    "Check that the clouseau.db-interface/read-changes-for-user definition exists."
+    (testing "if the clouseau.db-interface/read-changes-for-user definition exists."
+        (is (callable? 'clouseau.db-interface/read-changes-for-user))))
+
+(deftest test-read-ccs-description-existence
+    "Check that the clouseau.db-interface/read-ccs-description definition exists."
+    (testing "if the clouseau.db-interface/read-ccs-description definition exists."
+        (is (callable? 'clouseau.db-interface/read-ccs-description))))
 
