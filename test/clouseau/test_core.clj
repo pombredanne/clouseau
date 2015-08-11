@@ -38,7 +38,8 @@
 
 (ns clouseau.test-core
   (:require [clojure.test :refer :all]
-            [clouseau.core :refer :all]))
+            [clouseau.core :refer :all]
+            [ring.adapter.jetty :as jetty]))
 
 ;
 ; Common functions used by tests.
@@ -119,7 +120,9 @@
     (testing "the function clouseau.core/get-port."
         (is (thrown? AssertionError (get-port "0")))
         (is (thrown? AssertionError (get-port "-1")))
+        (is (thrown? AssertionError (get-port "-2")))
         (is (thrown? AssertionError (get-port "65536")))
+        (is (thrown? AssertionError (get-port "65537")))
         (is (thrown? AssertionError (get-port "1000000")))))
 
 (deftest test-get-and-check-port
@@ -136,5 +139,36 @@
         (is (thrown? AssertionError (get-and-check-port "-1")))
         (is (thrown? AssertionError (get-and-check-port "0")))
         (is (thrown? AssertionError (get-and-check-port "65536")))
+        (is (thrown? AssertionError (get-and-check-port "65537")))
         (is (thrown? AssertionError (get-and-check-port "1000000")))))
+
+(deftest test-start-server-positive-1
+    (testing "clouseau.core/start-server"
+        ; use mock instead of jetty/run-jetty
+        (with-redefs [jetty/run-jetty (fn [app port] port)]
+            (is (= {:port 1}     (start-server "1")))
+            (is (= {:port 2}     (start-server "2")))
+            (is (= {:port 1000}  (start-server "1000")))
+            (is (= {:port 65534} (start-server "65534")))
+            (is (= {:port 65535} (start-server "65535"))))))
+
+(deftest test-start-server-positive-2
+    (testing "clouseau.core/start-server"
+        ; use mock instead of jetty/run-jetty
+        (with-redefs [jetty/run-jetty (fn [app port] app)]
+            (is (= app (start-server "1")))
+            (is (= app (start-server "2")))
+            (is (= app (start-server "1000")))
+            (is (= app (start-server "65534")))
+            (is (= app (start-server "65535"))))))
+
+(deftest test-start-server-negative
+    (testing "clouseau.core/start-server"
+        ; use mock instead of jetty/run-jetty
+        (with-redefs [jetty/run-jetty (fn [app port] port)]
+            (is (= {:port -1}      (start-server "-1")))
+            (is (= {:port 0}       (start-server "0")))
+            (is (= {:port 65536}   (start-server "65536")))
+            (is (= {:port 65537}   (start-server "65537")))
+            (is (= {:port 1000000} (start-server "1000000"))))))
 
