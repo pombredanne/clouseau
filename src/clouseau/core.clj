@@ -51,17 +51,18 @@
     "3000")
 
 (def cli-options
+    "Definitions of all command line options currenty supported."
     ;; an option with a required argument
-  [["-p" "--port   PORT"    "port number"   :id :port]])
+    [["-p" "--port   PORT"    "port number"   :id :port]])
 
 (def app
-    "Ring application."
-    (-> server/handler
-        cookies/wrap-cookies
-        http-params/wrap-params))
+    "Definition of a Ring-based application behaviour."
+    (-> server/handler            ; handle all events
+        cookies/wrap-cookies      ; we need to work with cookies
+        http-params/wrap-params)) ; and to process request parameters, of course
 
 (defn start-server
-    "Start server on specified port."
+    "Start the HTTP server on the specified port."
     [port]
     (println "Starting the server at the port: " port)
     (jetty/run-jetty app {:port (read-string port)}))
@@ -89,4 +90,6 @@
           options          (all-options :options)
           port             (options :port)]
           (start-server    (get-port port))))
+
+; finito
 
