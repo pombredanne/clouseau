@@ -143,3 +143,15 @@
                 (is (= "select description from packages where lower(name)='';"
                     (read-description product "")))))))
 
+(deftest test-read-description-negative
+    (testing "clouseau.db-interface/read-description"
+        ; use mock instead of jdbc/query
+        (with-redefs [jdbc/query (fn [product package] package)]
+            (let [product ["RHEL 6"                                   ; first
+                              {:classname   "org.sqlite.JDBC"         ; second
+                               :subprotocol "sqlite"
+                               :subname     "packages/rhel6/primary.sqlite"
+                           }]]
+                (is (thrown? NullPointerException (read-description product nil)))
+                (is (thrown? NullPointerException (read-description nil nil)))))))
+
