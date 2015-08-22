@@ -40,7 +40,7 @@
 
 (defn render-package-descriptions
     [package-descriptions]
-    (for [p package-descriptions]
+    (for [p (into (sorted-map) package-descriptions)]
         (str "[" (key p) "]\n"
                  (val p) "\n\n")))
 
