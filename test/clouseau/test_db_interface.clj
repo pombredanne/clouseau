@@ -37,8 +37,10 @@
 ;;; 
 
 (ns clouseau.test-db-interface
-  (:require [clojure.test :refer :all]
-            [clouseau.db-interface :refer :all]))
+  (:require [clojure.test           :refer :all]
+            [clouseau.db-interface  :refer :all]
+            [clojure.java.jdbc      :as jdbc]
+            [clouseau.db-spec       :as db-spec]))
 
 ;
 ; Common functions used by tests.
@@ -97,4 +99,19 @@
     "Check that the clouseau.db-interface/store-changes definition exists."
     (testing "if the clouseau.db-interface/store-changes definition exists."
         (is (callable? 'clouseau.db-interface/store-changes))))
+
+;
+; Tests for function behaviours
+;
+
+(deftest test-read-description-1
+    (testing "clouseau.db-interface/read-description"
+        ; use mock instead of jdbc/query
+        (with-redefs [jdbc/query (fn [product package] product)]
+            (let [product ["RHEL 6"
+                              {:classname   "org.sqlite.JDBC"
+                               :subprotocol "sqlite"
+                               :subname     "packages/rhel6/primary.sqlite"
+                           }]]
+            (is (= (second product) (read-description product "package-name")))))))
 
