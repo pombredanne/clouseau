@@ -124,10 +124,22 @@
                                :subprotocol "sqlite"
                                :subname     "packages/rhel6/primary.sqlite"
                            }]]
-            (is (= "select description from packages where lower(name)='package-name';"
-                (read-description product "package-name")))
-            (is (= "select description from packages where lower(name)='package-name';"
-                (read-description product "Package-Name")))
-            (is (= "select description from packages where lower(name)='package-name';"
-                (read-description product "PACKAGE-NAME")))))))
+                (is (= "select description from packages where lower(name)='package-name';"
+                    (read-description product "package-name")))
+                (is (= "select description from packages where lower(name)='package-name';"
+                    (read-description product "Package-Name")))
+                (is (= "select description from packages where lower(name)='package-name';"
+                    (read-description product "PACKAGE-NAME")))))))
+
+(deftest test-read-description-3
+    (testing "clouseau.db-interface/read-description"
+        ; use mock instead of jdbc/query
+        (with-redefs [jdbc/query (fn [product package] package)]
+            (let [product ["RHEL 6"                                   ; first
+                              {:classname   "org.sqlite.JDBC"         ; second
+                               :subprotocol "sqlite"
+                               :subname     "packages/rhel6/primary.sqlite"
+                           }]]
+                (is (= "select description from packages where lower(name)='';"
+                    (read-description product "")))))))
 
