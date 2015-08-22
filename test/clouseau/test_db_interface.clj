@@ -88,3 +88,13 @@
     (testing "if the clouseau.db-interface/read-all-packages-provided-by-ccs definition exists."
         (is (callable? 'clouseau.db-interface/read-all-packages-provided-by-ccs))))
 
+(deftest test-store-ccs-description-existence
+    "Check that the clouseau.db-interface/store-ccs-description definition exists."
+    (testing "if the clouseau.db-interface/store-ccs-description definition exists."
+        (is (callable? 'clouseau.db-interface/store-ccs-description))))
+
+(deftest test-store-changes-existence
+    "Check that the clouseau.db-interface/store-changes definition exists."
+    (testing "if the clouseau.db-interface/store-changes definition exists."
+        (is (callable? 'clouseau.db-interface/store-changes))))
+
