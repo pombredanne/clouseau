@@ -78,3 +78,13 @@
     (testing "if the clouseau.db-interface/read-ccs-description definition exists."
         (is (callable? 'clouseau.db-interface/read-ccs-description))))
 
+(deftest test-read-all-descriptions-existence
+    "Check that the clouseau.db-interface/read-all-descriptions definition exists."
+    (testing "if the clouseau.db-interface/read-all-descriptions definition exists."
+        (is (callable? 'clouseau.db-interface/read-all-descriptions))))
+
+(deftest test-read-all-packages-provided-by-ccs-existence
+    "Check that the clouseau.db-interface/read-all-packages-provided-by-ccs definition exists."
+    (testing "if the clouseau.db-interface/read-all-packages-provided-by-ccs definition exists."
+        (is (callable? 'clouseau.db-interface/read-all-packages-provided-by-ccs))))
+
