@@ -89,6 +89,12 @@
         (is (= (render-front-page nil "PACKAGE" {"x" "y"} "***" nil nil nil nil) "[Package]\nPACKAGE\n\n[CCS Description]\n***\n\n[x]\ny\n\n"))
         (is (= (render-front-page nil "PACKAGE" {"prod1" "text1" "prod2" "text2"} "***" nil nil nil nil) "[Package]\nPACKAGE\n\n[CCS Description]\n***\n\n[prod1]\ntext1\n\n[prod2]\ntext2\n\n"))))
 
+(deftest test-render-package-descriptions-special-cases
+    "Check the function clouseau.text-renderer/render-package-descriptions"
+    (testing "the function clouseau.text-renderer/render-package-descriptions"
+        (is (= (render-package-descriptions {"x" nil}) '("[x]\n\n\n")))
+        (is (= (render-package-descriptions {}) '()))))
+
 (deftest test-render-package-descriptions
     "Check the function clouseau.text-renderer/render-package-descriptions"
     (testing "the function clouseau.text-renderer/render-package-descriptions"
