@@ -108,10 +108,26 @@
     (testing "clouseau.db-interface/read-description"
         ; use mock instead of jdbc/query
         (with-redefs [jdbc/query (fn [product package] product)]
-            (let [product ["RHEL 6"
-                              {:classname   "org.sqlite.JDBC"
+            (let [product ["RHEL 6"                                   ; first
+                              {:classname   "org.sqlite.JDBC"         ; second
                                :subprotocol "sqlite"
                                :subname     "packages/rhel6/primary.sqlite"
                            }]]
             (is (= (second product) (read-description product "package-name")))))))
+
+(deftest test-read-description-2
+    (testing "clouseau.db-interface/read-description"
+        ; use mock instead of jdbc/query
+        (with-redefs [jdbc/query (fn [product package] package)]
+            (let [product ["RHEL 6"                                   ; first
+                              {:classname   "org.sqlite.JDBC"         ; second
+                               :subprotocol "sqlite"
+                               :subname     "packages/rhel6/primary.sqlite"
+                           }]]
+            (is (= "select description from packages where lower(name)='package-name';"
+                (read-description product "package-name")))
+            (is (= "select description from packages where lower(name)='package-name';"
+                (read-description product "Package-Name")))
+            (is (= "select description from packages where lower(name)='package-name';"
+                (read-description product "PACKAGE-NAME")))))))
 
