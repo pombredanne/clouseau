@@ -40,9 +40,10 @@
 
 (defn render-package-descriptions
     [package-descriptions]
-    (for [p package-descriptions]
-        (str "[" (key p) "]\n"
-                 (val p) "\n\n")))
+    (let [sorted-descriptions (into (sorted-map) package-descriptions)]
+        (for [p sorted-descriptions]
+            (str "[" (key p) "]\n"
+                     (val p) "\n\n"))))
 
 (defn render-front-page
     [products package package-descriptions ccs-description products-per-descriptions products-without-descriptions new-description user-name]

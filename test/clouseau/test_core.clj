@@ -173,8 +173,12 @@
             (is (= {:port 1000000} (start-server "1000000"))))))
 
 (deftest test-main-basic
-    (testing "clouseau.core/start-server"
+    (testing "clouseau.core/-main"
         ; use mock instead of jetty/run-jetty
         (with-redefs [jetty/run-jetty (fn [app port] port)]
-            (is (= {:port 3000}    (-main))))))
+            (is (= {:port 3000}    (-main)))
+            (is (= {:port 3000}    (-main "-1")))
+            (is (= {:port 3000}    (-main "-p" "3000")))
+            (is (= {:port 9999}    (-main "-p" "9999")))
+            )))
 
