@@ -36,7 +36,7 @@
 ;;; exception statement from your version.
 ;;; 
 
-(ns clouseau.test-core
+(ns clouseau.test-json-renderer
   (:require [clojure.test :refer :all]
             [clouseau.json-renderer :refer :all]))
 
