@@ -78,7 +78,6 @@
     (testing "if the clouseau.html-renderer/render-navigation-bar-section definition exists."
         (is (callable? 'clouseau.html-renderer/render-navigation-bar-section))))
 
-
 (deftest test-render-description-existence
     "Check that the clouseau.html-renderer/render-description definition exists."
     (testing "if the clouseau.html-renderer/render-description definition exists."
@@ -99,8 +98,18 @@
     (testing "if the clouseau.html-renderer/render-descriptions definition exists."
         (is (callable? 'clouseau.html-renderer/render-descriptions))))
 
-(deftest test-render-navigation-bar-section-existence
-    "Check that the clouseau.html-renderer/render-navigation-bar-section definition exists."
-    (testing "if the clouseau.html-renderer/render-navigation-bar-section definition exists."
-        (is (callable? 'clouseau.html-renderer/render-navigation-bar-section))))
+(deftest test-render-user-existence
+    "Check that the clouseau.html-renderer/render-user definition exists."
+    (testing "if the clouseau.html-renderer/render-user definition exists."
+        (is (callable? 'clouseau.html-renderer/render-user))))
+
+(deftest test-render-users-existence
+    "Check that the clouseau.html-renderer/render-users definition exists."
+    (testing "if the clouseau.html-renderer/render-users definition exists."
+        (is (callable? 'clouseau.html-renderer/render-users))))
+
+(deftest test-render-admin-interface-existence
+    "Check that the clouseau.html-renderer/render-admin-interface definition exists."
+    (testing "if the clouseau.html-renderer/render-admin-interface definition exists."
+        (is (callable? 'clouseau.html-renderer/render-admin-interface))))
 
