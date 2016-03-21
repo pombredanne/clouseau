@@ -36,7 +36,7 @@
 ;;; exception statement from your version.
 ;;; 
 
-(ns clouseau.test-core
+(ns clouseau.test-server
   (:require [clojure.test :refer :all]
             [clouseau.server :refer :all]))
 
