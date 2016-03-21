@@ -78,3 +78,29 @@
     (testing "if the clouseau.html-renderer/render-navigation-bar-section definition exists."
         (is (callable? 'clouseau.html-renderer/render-navigation-bar-section))))
 
+
+(deftest test-render-description-existence
+    "Check that the clouseau.html-renderer/render-description definition exists."
+    (testing "if the clouseau.html-renderer/render-description definition exists."
+        (is (callable? 'clouseau.html-renderer/render-description))))
+
+(deftest test-render-error-page-existence
+    "Check that the clouseau.html-renderer/render-error-page definition exists."
+    (testing "if the clouseau.html-renderer/render-error-page definition exists."
+        (is (callable? 'clouseau.html-renderer/render-error-page))))
+
+(deftest test-render-front-page-existence
+    "Check that the clouseau.html-renderer/render-front-page definition exists."
+    (testing "if the clouseau.html-renderer/render-front-page definition exists."
+        (is (callable? 'clouseau.html-renderer/render-front-page))))
+
+(deftest test-render-descriptions-existence
+    "Check that the clouseau.html-renderer/render-descriptions definition exists."
+    (testing "if the clouseau.html-renderer/render-descriptions definition exists."
+        (is (callable? 'clouseau.html-renderer/render-descriptions))))
+
+(deftest test-render-navigation-bar-section-existence
+    "Check that the clouseau.html-renderer/render-navigation-bar-section definition exists."
+    (testing "if the clouseau.html-renderer/render-navigation-bar-section definition exists."
+        (is (callable? 'clouseau.html-renderer/render-navigation-bar-section))))
+
