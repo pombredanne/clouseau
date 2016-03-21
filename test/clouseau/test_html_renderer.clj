@@ -1,7 +1,7 @@
 ;;;
 ;;;   Clouseau
 ;;; 
-;;;    Copyright (C) 2015 Pavel Tisnovsky <ptisnovs@redhat.com>
+;;;    Copyright (C) 2015, 2016 Pavel Tisnovsky <ptisnovs@redhat.com>
 ;;; 
 ;;; Clouseau is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -40,4 +40,41 @@
   (:require [clojure.test :refer :all]
             [clouseau.html-renderer :refer :all]))
 
+;
+; Common functions used by tests.
+;
+
+(defn callable?
+    "Test if given function-name is bound to the real function."
+    [function-name]
+    (clojure.test/function? function-name))
+
+;
+; Tests for various defs and functions
+;
+
+(deftest test-render-html-header-existence
+    "Check that the clouseau.html-renderer/render-html-header definition exists."
+    (testing "if the clouseau.html-renderer/render-html-header definition exists."
+        (is (callable? 'clouseau.html-renderer/render-html-header))))
+
+(deftest test-render-html-footer-existence
+    "Check that the clouseau.html-renderer/render-html-footer definition exists."
+    (testing "if the clouseau.html-renderer/render-html-footer definition exists."
+        (is (callable? 'clouseau.html-renderer/render-html-footer))))
+
+(deftest test-render-search-field-existence
+    "Check that the clouseau.html-renderer/render-search-field definition exists."
+    (testing "if the clouseau.html-renderer/render-search-field definition exists."
+        (is (callable? 'clouseau.html-renderer/render-search-field))))
+
+(deftest test-render-name-field-existence
+    "Check that the clouseau.html-renderer/render-name-field definition exists."
+    (testing "if the clouseau.html-renderer/render-name-field definition exists."
+        (is (callable? 'clouseau.html-renderer/render-name-field))))
+
+(deftest test-render-navigation-bar-section-existence
+    "Check that the clouseau.html-renderer/render-navigation-bar-section definition exists."
+    (testing "if the clouseau.html-renderer/render-navigation-bar-section definition exists."
+        (is (callable? 'clouseau.html-renderer/render-navigation-bar-section))))
 
